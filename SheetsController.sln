@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoogleSheetsTimeTable", "GoogleSheetsTimeTable\GoogleSheetsTimeTable.csproj", "{9138F314-C134-44E9-93CA-7AE453DF0305}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{0CE002C5-E289-45DA-A33B-E42D3D118126}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9138F314-C134-44E9-93CA-7AE453DF0305}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9138F314-C134-44E9-93CA-7AE453DF0305}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9138F314-C134-44E9-93CA-7AE453DF0305}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9138F314-C134-44E9-93CA-7AE453DF0305}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0CE002C5-E289-45DA-A33B-E42D3D118126}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0CE002C5-E289-45DA-A33B-E42D3D118126}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0CE002C5-E289-45DA-A33B-E42D3D118126}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0CE002C5-E289-45DA-A33B-E42D3D118126}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

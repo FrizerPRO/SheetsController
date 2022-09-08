@@ -1,0 +1,12 @@
+/Users/Frizer/RiderProjects/SheetsController/GoogleSheetsTimeTable/bin/Debug/net6.0/GoogleSheetsTimeTable.deps.json
+/Users/Frizer/RiderProjects/SheetsController/GoogleSheetsTimeTable/bin/Debug/net6.0/GoogleSheetsTimeTable.dll
+/Users/Frizer/RiderProjects/SheetsController/GoogleSheetsTimeTable/bin/Debug/net6.0/GoogleSheetsTimeTable.pdb
+/Users/Frizer/RiderProjects/SheetsController/GoogleSheetsTimeTable/obj/Debug/net6.0/GoogleSheetsTimeTable.csproj.AssemblyReference.cache
+/Users/Frizer/RiderProjects/SheetsController/GoogleSheetsTimeTable/obj/Debug/net6.0/GoogleSheetsTimeTable.GeneratedMSBuildEditorConfig.editorconfig
+/Users/Frizer/RiderProjects/SheetsController/GoogleSheetsTimeTable/obj/Debug/net6.0/GoogleSheetsTimeTable.AssemblyInfoInputs.cache
+/Users/Frizer/RiderProjects/SheetsController/GoogleSheetsTimeTable/obj/Debug/net6.0/GoogleSheetsTimeTable.AssemblyInfo.cs
+/Users/Frizer/RiderProjects/SheetsController/GoogleSheetsTimeTable/obj/Debug/net6.0/GoogleSheetsTimeTable.csproj.CoreCompileInputs.cache
+/Users/Frizer/RiderProjects/SheetsController/GoogleSheetsTimeTable/obj/Debug/net6.0/GoogleSheetsTimeTable.dll
+/Users/Frizer/RiderProjects/SheetsController/GoogleSheetsTimeTable/obj/Debug/net6.0/refint/GoogleSheetsTimeTable.dll
+/Users/Frizer/RiderProjects/SheetsController/GoogleSheetsTimeTable/obj/Debug/net6.0/GoogleSheetsTimeTable.pdb
+/Users/Frizer/RiderProjects/SheetsController/GoogleSheetsTimeTable/obj/Debug/net6.0/ref/GoogleSheetsTimeTable.dll
