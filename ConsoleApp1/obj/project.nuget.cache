@@ -1,14 +1,15 @@
 {
   "version": 2,
-  "dgSpecHash": "ONdG/81B66vKp6z50Q2j184E1+q/iQSQhtoPscjkfse8rDlSwu3ziMbWxfc8s7HKTmBWVErZc5ixrb1ep6n4pA==",
+  "dgSpecHash": "PDKnzARicVwKun3FTI8ugHUYI2Y3P+US4ggYUoHqXzvqmaXxW9Y38oXSt33x1OePXDRHYGNnDJAzkfjf4W6OHw==",
   "success": true,
-  "projectFilePath": "/Users/Frizer/RiderProjects/SheetsController/ConsoleApp1/ConsoleApp1.csproj",
+  "projectFilePath": "C:\\Users\\loxam\\RiderProjects\\SheetsController\\ConsoleApp1\\ConsoleApp1.csproj",
   "expectedPackageFiles": [
-    "/Users/Frizer/.nuget/packages/google.apis/1.57.0/google.apis.1.57.0.nupkg.sha512",
-    "/Users/Frizer/.nuget/packages/google.apis.auth/1.57.0/google.apis.auth.1.57.0.nupkg.sha512",
-    "/Users/Frizer/.nuget/packages/google.apis.core/1.57.0/google.apis.core.1.57.0.nupkg.sha512",
-    "/Users/Frizer/.nuget/packages/google.apis.sheets.v4/1.57.0.2727/google.apis.sheets.v4.1.57.0.2727.nupkg.sha512",
-    "/Users/Frizer/.nuget/packages/newtonsoft.json/13.0.1/newtonsoft.json.13.0.1.nupkg.sha512"
+    "C:\\Users\\loxam\\.nuget\\packages\\google.apis\\1.57.0\\google.apis.1.57.0.nupkg.sha512",
+    "C:\\Users\\loxam\\.nuget\\packages\\google.apis.auth\\1.57.0\\google.apis.auth.1.57.0.nupkg.sha512",
+    "C:\\Users\\loxam\\.nuget\\packages\\google.apis.core\\1.57.0\\google.apis.core.1.57.0.nupkg.sha512",
+    "C:\\Users\\loxam\\.nuget\\packages\\google.apis.sheets.v4\\1.57.0.2727\\google.apis.sheets.v4.1.57.0.2727.nupkg.sha512",
+    "C:\\Users\\loxam\\.nuget\\packages\\newtonsoft.json\\13.0.1\\newtonsoft.json.13.0.1.nupkg.sha512",
+    "C:\\Users\\loxam\\.nuget\\packages\\telegram.bot\\18.0.0\\telegram.bot.18.0.0.nupkg.sha512"
   ],
   "logs": []
 }

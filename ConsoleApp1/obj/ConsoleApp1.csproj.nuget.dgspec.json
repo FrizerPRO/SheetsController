@@ -1,33 +1,35 @@
 {
   "format": 1,
   "restore": {
-    "/Users/Frizer/RiderProjects/SheetsController/ConsoleApp1/ConsoleApp1.csproj": {}
+    "C:\\Users\\loxam\\RiderProjects\\SheetsController\\ConsoleApp1\\ConsoleApp1.csproj": {}
   },
   "projects": {
-    "/Users/Frizer/RiderProjects/SheetsController/ConsoleApp1/ConsoleApp1.csproj": {
+    "C:\\Users\\loxam\\RiderProjects\\SheetsController\\ConsoleApp1\\ConsoleApp1.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/Frizer/RiderProjects/SheetsController/ConsoleApp1/ConsoleApp1.csproj",
+        "projectUniqueName": "C:\\Users\\loxam\\RiderProjects\\SheetsController\\ConsoleApp1\\ConsoleApp1.csproj",
         "projectName": "ConsoleApp1",
-        "projectPath": "/Users/Frizer/RiderProjects/SheetsController/ConsoleApp1/ConsoleApp1.csproj",
-        "packagesPath": "/Users/Frizer/.nuget/packages/",
-        "outputPath": "/Users/Frizer/RiderProjects/SheetsController/ConsoleApp1/obj/",
+        "projectPath": "C:\\Users\\loxam\\RiderProjects\\SheetsController\\ConsoleApp1\\ConsoleApp1.csproj",
+        "packagesPath": "C:\\Users\\loxam\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\loxam\\RiderProjects\\SheetsController\\ConsoleApp1\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/Users/Frizer/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\loxam\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net6.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "/Users/Frizer/RiderProjects/SheetsController/GoogleSheetsTimeTable/GoogleSheetsTimeTable.csproj": {
-                "projectPath": "/Users/Frizer/RiderProjects/SheetsController/GoogleSheetsTimeTable/GoogleSheetsTimeTable.csproj"
+              "C:\\Users\\loxam\\RiderProjects\\SheetsController\\GoogleSheetsTimeTable\\GoogleSheetsTimeTable.csproj": {
+                "projectPath": "C:\\Users\\loxam\\RiderProjects\\SheetsController\\GoogleSheetsTimeTable\\GoogleSheetsTimeTable.csproj"
               }
             }
           }
@@ -41,13 +43,20 @@
       "frameworks": {
         "net6.0": {
           "targetAlias": "net6.0",
+          "dependencies": {
+            "Telegram.Bot": {
+              "target": "Package",
+              "version": "[18.0.0, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
             "net47",
             "net471",
             "net472",
-            "net48"
+            "net48",
+            "net481"
           ],
           "assetTargetFallback": true,
           "warn": true,
@@ -56,26 +65,28 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/6.0.202/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.400\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "/Users/Frizer/RiderProjects/SheetsController/GoogleSheetsTimeTable/GoogleSheetsTimeTable.csproj": {
+    "C:\\Users\\loxam\\RiderProjects\\SheetsController\\GoogleSheetsTimeTable\\GoogleSheetsTimeTable.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/Frizer/RiderProjects/SheetsController/GoogleSheetsTimeTable/GoogleSheetsTimeTable.csproj",
+        "projectUniqueName": "C:\\Users\\loxam\\RiderProjects\\SheetsController\\GoogleSheetsTimeTable\\GoogleSheetsTimeTable.csproj",
         "projectName": "GoogleSheetsTimeTable",
-        "projectPath": "/Users/Frizer/RiderProjects/SheetsController/GoogleSheetsTimeTable/GoogleSheetsTimeTable.csproj",
-        "packagesPath": "/Users/Frizer/.nuget/packages/",
-        "outputPath": "/Users/Frizer/RiderProjects/SheetsController/GoogleSheetsTimeTable/obj/",
+        "projectPath": "C:\\Users\\loxam\\RiderProjects\\SheetsController\\GoogleSheetsTimeTable\\GoogleSheetsTimeTable.csproj",
+        "packagesPath": "C:\\Users\\loxam\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\loxam\\RiderProjects\\SheetsController\\GoogleSheetsTimeTable\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/Users/Frizer/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\loxam\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net6.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -97,6 +108,10 @@
             "Google.Apis.Sheets.v4": {
               "target": "Package",
               "version": "[1.57.0.2727, )"
+            },
+            "Telegram.Bot": {
+              "target": "Package",
+              "version": "[18.0.0, )"
             }
           },
           "imports": [
@@ -105,7 +120,8 @@
             "net47",
             "net471",
             "net472",
-            "net48"
+            "net48",
+            "net481"
           ],
           "assetTargetFallback": true,
           "warn": true,
@@ -114,7 +130,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/6.0.202/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.400\\RuntimeIdentifierGraph.json"
         }
       }
     }

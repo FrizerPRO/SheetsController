@@ -8,9 +8,10 @@ namespace SheetsController;
 [Serializable]
 public class SheetsController
 {
-    private static readonly TimeSpan MinimumStep = TimeSpan.FromMinutes(30);
+    public static readonly TimeSpan MinimumStep = TimeSpan.FromMinutes(30);
 
     private static readonly TimeSpan TotalDuration = TimeSpan.FromDays(2) - MinimumStep;
+    public static readonly TimeSpan MaxReservationDuration = TimeSpan.FromHours(5);
 
     private static readonly string ApplicationName = "DICK";
 
@@ -94,7 +95,7 @@ public class SheetsController
         return SetFreeTime(values, startTime, nickname, duration);
     }
 
-    internal List<GameTable> GetFreeTables(PlayZone zone, TimeSpan duration, int tableNumber = -1)
+    public List<GameTable> GetFreeTables(PlayZone zone, TimeSpan duration, int tableNumber = -1)
     {
         var values = GetTable(GetRange(zone, tableNumber));
         values = ChangeTimeForFree(values, duration);
@@ -116,6 +117,22 @@ public class SheetsController
         });
     }
 
+    public static List<TimeSpan> GetAllFreeTimeSpans(List<GameTable> gameTables)
+    {
+        List<TimeSpan> result = new();
+        foreach (var table in gameTables)
+        {
+            foreach (var freeTime in table.FreeTime)
+            {
+                if (!result.Contains(freeTime))
+                {
+                    result.Add(freeTime);
+                }
+            }
+        }
+        result.Sort();
+        return result;
+    }
     private static UserCredential GetCredential()
     {
         using var stream =
