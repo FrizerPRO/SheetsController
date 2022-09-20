@@ -87,12 +87,12 @@ public class SheetsController
     }
 
     public Reservation? TrySetFreeTime(List<GameTable> values, TimeSpan startTime, string nickname,
-        TimeSpan duration, PlayZone zone, int tableNumber = -1)
+        TimeSpan duration, PlayZone zone,string additionalInfo, int tableNumber = -1)
     {
         var valuesToCompare = GetFreeTables(zone, duration, tableNumber);
         if (valuesToCompare.Find(table => table.FreeTime.Contains(startTime)) == null)
             return null;
-        return SetFreeTime(values, startTime, nickname, duration);
+        return SetFreeTime(values, startTime, nickname, duration,additionalInfo);
     }
 
     public List<GameTable> GetFreeTables(PlayZone zone, TimeSpan duration, int tableNumber = -1)
@@ -146,14 +146,15 @@ public class SheetsController
             CancellationToken.None).Result;
     }
 
-    private Reservation? SetFreeTime(List<GameTable> tables, TimeSpan userTime, string nickname, TimeSpan duration)
+    private Reservation? SetFreeTime(List<GameTable> tables, TimeSpan userTime, string nickname, TimeSpan duration,string additionalInfo)
     {
         GameTable? resultTable = null;
         foreach (var table in tables.Where(table => table.FreeTime.Contains(userTime))) resultTable = table;
         if (resultTable == null)
             return null;
         var range = GetRangeForFillingTables(resultTable, userTime, duration);
-        var cell = CreateCell(nickname, new CellFormat
+        var cell = CreateCell(additionalInfo==""? nickname:
+            nickname+"::->"+additionalInfo, new CellFormat
         {
             BackgroundColor = new Color
             {
@@ -167,13 +168,14 @@ public class SheetsController
                 Bold = true
             }
         });
+        Console.WriteLine(cell.ToString());
         var requests = new List<Request>
         {
             GetRequestToFill(range, cell)
         };
         FillCells(requests, SpreadsheetId);
         
-        return new Reservation(resultTable,userTime,duration);
+        return new Reservation(resultTable,userTime,duration,additionalInfo);
     }
 
     protected internal static void FillCells( /*Data.GridRange range, Data.CellData cell,string spreadSheetId*/
@@ -236,7 +238,7 @@ public class SheetsController
         
     }
 
-    protected internal static GridRange GetRangeForSingleCell(int startColumn, int startRow, Sheet sheet)
+    public static GridRange GetRangeForSingleCell(int startColumn, int startRow, Sheet sheet)
     {
         var sheetId = (int)sheet.Properties.SheetId!;
         return new GridRange
@@ -337,9 +339,11 @@ public class SheetsController
     }
     protected internal static IList<IList<object>>? GetValuesFromRange(string range, string spreadsheetId)
     {
+        
         var request =
             Service.Spreadsheets.Values.Get(spreadsheetId, range);
         var response = request.Execute();
+        
         IList<IList<object>> values = response.Values;
         return values;
     }

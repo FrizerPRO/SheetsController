@@ -36,6 +36,7 @@ public class PlayZone
         var requests = new List<Request>();
         Refresh();
         var turnedValues = TurnValues(valuesToUpdate,Capacity,rowToRenewFrom);
+        
         for (var i = 0; i < Capacity; i++)
         {
             for (var j = 0; j < rowToRenewFrom; j++)
@@ -48,6 +49,7 @@ public class PlayZone
                 }
                 
                 if (duration <= 0) continue;
+
                 TimeSpan startTime = SheetsController.TimeToRowNumber.FirstOrDefault(
                     item => item.Value == j - duration + 2).Key;
                 TimeSpan durationInTime = SheetsController.TimeToRowNumber.FirstOrDefault(
@@ -55,8 +57,15 @@ public class PlayZone
                 Console.WriteLine();
                 var values = SheetsController.GetFreeTables(this,durationInTime,
                     i + 1);
-                UserControl.AddReservation(new User(turnedValues[i][j-1].ToString()!), values,startTime,
-                    durationInTime, i + 1);
+                //TODO: Renew additional info also.
+                var allValues = turnedValues[i][j - 1].ToString()!
+                    .Split("::->", StringSplitOptions.RemoveEmptyEntries);
+                var nickname = allValues[0];
+                var additionalInfo = "";
+                if (allValues.Length > 1)
+                    additionalInfo = allValues[1];
+                UserControl.AddReservation(new User(nickname), values,startTime,
+                    durationInTime,additionalInfo ,i + 1);
             }
         }
 

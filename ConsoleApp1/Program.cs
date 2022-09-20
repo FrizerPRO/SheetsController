@@ -87,4 +87,8 @@ async Task NewFunction()
     }
 }
 
-await NewFunction();
+//await NewFunction();
+SheetsController.SheetsController sheetsController = new("1PQTy_fIQSOaw2RQoDwkY2F_TCRdPxbQ3E64jclb-Av0");
+PlayZone zone = new("Comfort", 9, sheetsController);
+zone.RefreshInMidnight();
+//zone.Refresh();

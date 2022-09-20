@@ -4,6 +4,12 @@ namespace SheetsController;
 public class Reservation
 {
     public GameTable Table { get; set; }
+
+    public string AdditionalInfo
+    {
+        get;
+        set;
+    }
     public TimeSpan StartTime { get; set; }
     public TimeSpan Duration { get; set; }
 
@@ -17,10 +23,11 @@ public class Reservation
 
     
 
-    public Reservation(GameTable table, TimeSpan startTime, TimeSpan duration)
+    public Reservation(GameTable table, TimeSpan startTime, TimeSpan duration,string additionalInfo)
     {
         this.Table = table;
         StartTime = startTime;
         this.Duration = duration;
+        AdditionalInfo = additionalInfo;
     }
 }

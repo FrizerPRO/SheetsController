@@ -48,13 +48,14 @@ public static class UserControl
         user.Reservations = resulReservations;
         SerializeUser(user);
     }
-    public static bool AddReservation(User user,List<GameTable> tables,TimeSpan startTime, TimeSpan duration,int tableNumber)
+    
+    public static bool AddReservation(User user,List<GameTable> tables,TimeSpan startTime, TimeSpan duration,string additionalInfo,int tableNumber)
     {
         user = DeserializeUser(user);
         if (tables.Count == 0)
             return false;
         var res =  tables[0].Zone.SheetsController.
-            TrySetFreeTime(tables, startTime, user.Nickname, duration, tables[0].Zone, tableNumber);
+            TrySetFreeTime(tables, startTime, user.Nickname, duration, tables[0].Zone, additionalInfo,tableNumber);
         if (res == null)
             return false;
         user.Reservations.Add(res);
