@@ -18,11 +18,7 @@ public class SheetsController
     protected internal static readonly SheetsService Service;
     private static readonly string[] Scopes = { SheetsService.Scope.Spreadsheets };
 
-    public string SpreadsheetId
-    {
-        get;
-        set;
-    } //= "1PQTy_fIQSOaw2RQoDwkY2F_TCRdPxbQ3E64jclb-Av0";
+    //public static string SpreadsheetId => DataBase.SpreadSheetId;
 
 
     static SheetsController()
@@ -33,11 +29,7 @@ public class SheetsController
             ApplicationName = ApplicationName
         });
     }
-
-    public SheetsController(string spreadsheetId)
-    {
-        SpreadsheetId = spreadsheetId;
-    }
+    
 
     protected internal static int TotalRows
     {
@@ -95,7 +87,7 @@ public class SheetsController
         return SetFreeTime(values, startTime, nickname, duration,additionalInfo);
     }
 
-    public List<GameTable> GetFreeTables(PlayZone zone, TimeSpan duration, int tableNumber = -1)
+    public static List<GameTable> GetFreeTables(PlayZone zone, TimeSpan duration, int tableNumber = -1)
     {
         var values = GetTable(GetRange(zone, tableNumber));
         values = ChangeTimeForFree(values, duration);
@@ -173,7 +165,7 @@ public class SheetsController
         {
             GetRequestToFill(range, cell)
         };
-        FillCells(requests, SpreadsheetId);
+        FillCells(requests, DataBase.SpreadSheetId);
         
         return new Reservation(resultTable,userTime,duration,additionalInfo);
     }
@@ -222,7 +214,7 @@ public class SheetsController
 
     protected internal GridRange GetRangeForFillingTables(GameTable table, TimeSpan startTime, TimeSpan duration)
     {
-        var spr = Service.Spreadsheets.Get(SpreadsheetId).Execute();
+        var spr = Service.Spreadsheets.Get(DataBase.SpreadSheetId).Execute();
         var sh = spr.Sheets.FirstOrDefault(s => s.Properties.Title ==
                                                 table.Zone.Name);
         var sheetId = (int)(sh!).Properties.SheetId!;
@@ -317,11 +309,11 @@ public class SheetsController
         return result;
     }
 
-    private List<GameTable> GetTable(List<GameTable> rangeOfTables)
+    private static List<GameTable> GetTable(List<GameTable> rangeOfTables)
     {
         foreach (var table in rangeOfTables)
         {
-            var values = GetValuesFromRange(table.Range,SpreadsheetId);
+            var values = GetValuesFromRange(table.Range,DataBase.SpreadSheetId);
             TimeSpan counter = new();
             if (values == null)
                 return rangeOfTables;

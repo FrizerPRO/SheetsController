@@ -21,6 +21,12 @@ public class Reservation
         get;
         set;
     }
+
+    public int TableNumber
+    {
+        get;
+        set;
+    }
     public TimeSpan StartTime { get; set; }
     public TimeSpan Duration { get; set; }
 

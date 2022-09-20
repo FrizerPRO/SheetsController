@@ -11,7 +11,7 @@ public class PlayZone
         Name = name;
         Capacity = capacity;
         SheetsController = sheetsController;
-        var spr = SheetsController.Service.Spreadsheets.Get(SheetsController.SpreadsheetId).Execute();
+        var spr = SheetsController.Service.Spreadsheets.Get(DataBase.SpreadSheetId).Execute();
         _sheet = spr.Sheets.FirstOrDefault(s => s.Properties.Title == Name)!;
     }
 
@@ -31,7 +31,7 @@ public class PlayZone
             $"{SheetsController.GetColumnName(2)}{rowToRenewFrom}:" +
             $"{SheetsController.GetColumnName(Capacity + 1)}" +
             $"{SheetsController.TotalRows}";
-        var valuesToUpdate = SheetsController.GetValuesFromRange(range, SheetsController.SpreadsheetId)
+        var valuesToUpdate = SheetsController.GetValuesFromRange(range, DataBase.SpreadSheetId)
                              ?? new List<IList<object>>();
         var requests = new List<Request>();
         Refresh();
@@ -69,7 +69,7 @@ public class PlayZone
             }
         }
 
-        SheetsController.FillCells(requests, SheetsController.SpreadsheetId);
+        SheetsController.FillCells(requests, DataBase.SpreadSheetId);
     }
     
 
@@ -114,7 +114,7 @@ public class PlayZone
             requests.Add(SheetsController.GetRequestToFill(range, cell));
         }
 
-        SheetsController.FillCells(requests, SheetsController.SpreadsheetId);
+        SheetsController.FillCells(requests, DataBase.SpreadSheetId);
     }
 
     private static string GetCellTextForRefreshing(int i, int j)
@@ -143,6 +143,6 @@ public class PlayZone
             reservation.Duration);
         var cell = SheetsController.CreateCell(string.Empty, new CellFormat());
         requests.Add(SheetsController.GetRequestToFill(range, cell));
-        SheetsController.FillCells(requests, SheetsController.SpreadsheetId);
+        SheetsController.FillCells(requests, DataBase.SpreadSheetId);
     }
 }

@@ -1,20 +1,13 @@
 using System.Security.Cryptography;
 
 namespace SheetsController;
+
 [Serializable]
 public class User
 {
-    public string Nickname
-    {
-        get;
-        set;
-    }
+    public string Nickname { get; set; }
 
-    public List<Reservation> Reservations
-    {
-        get;
-        set;
-    }
+    public List<Reservation> Reservations { get; set; }
 
     public User(string nickname, List<Reservation> reservations)
     {
@@ -29,6 +22,7 @@ public class User
         var templeUser = UserControl.DeserializeUser(this);
         Reservations = templeUser.Reservations;
     }
+
     public User()
     {
         Nickname = "";

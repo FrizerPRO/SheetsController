@@ -18,6 +18,7 @@ public static class UserControl
         var totalPath = Folder + fileName;
         if (!File.Exists(totalPath))
         {
+            SerializeUser(user);
             return user;
         }
         var json = File.ReadAllText(totalPath);
@@ -62,7 +63,18 @@ public static class UserControl
         UserControl.SerializeUser(user);
         return true;
     }
-
+    public static bool AddReservation(User user,Reservation reservation)
+    {
+        user = DeserializeUser(user);
+        var resToAddInfo = user.Reservations.Find(reservation1 => reservation1.InProcess);
+        if (resToAddInfo != null)
+        {
+            user.Reservations.Remove(resToAddInfo);
+        }
+        user.Reservations.Add(reservation);
+        UserControl.SerializeUser(user);
+        return true;
+    }
     public static void RemoveReservation(User user,Reservation reservation)
     {      
         user = DeserializeUser(user);

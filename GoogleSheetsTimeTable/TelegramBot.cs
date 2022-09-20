@@ -32,7 +32,7 @@ public class TelegramBot
         var receiverOptions = new ReceiverOptions
         {
             AllowedUpdates = new []{UpdateType.Message,UpdateType.CallbackQuery}
-        };
+        }; 
         BotClient.StartReceiving(
             updateHandler: TelegramBotController.HandleUpdateAsync,
             pollingErrorHandler: TelegramBotController.HandlePollingErrorAsync,

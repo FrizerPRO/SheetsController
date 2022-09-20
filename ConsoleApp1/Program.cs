@@ -57,13 +57,13 @@ async Task NewFunction()
         
         // Echo received message text
         //TODO: DELETE!!!!!!!!!!
-        SheetsController.SheetsController sheetsController = new("1PQTy_fIQSOaw2RQoDwkY2F_TCRdPxbQ3E64jclb-Av0");
+        SheetsController.SheetsController sheetsController = new();
         PlayZone zone = new("Comfort", 9, sheetsController);
         //zone.RefreshInMidnight();
         //zone.Refresh();
         var duration = TimeSpan.FromHours(1);
         var tableNumber = 5;
-        var values = sheetsController.GetFreeTables(zone, duration, tableNumber);
+        var values = SheetsController.SheetsController.GetFreeTables(zone, duration, tableNumber);
         //TODO: UP to here
         InlineKeyboardMarkup inlineKeyboard = TelegramBotController.GetFreeTimeTab(values);
 
@@ -88,7 +88,8 @@ async Task NewFunction()
 }
 
 //await NewFunction();
-SheetsController.SheetsController sheetsController = new("1PQTy_fIQSOaw2RQoDwkY2F_TCRdPxbQ3E64jclb-Av0");
-PlayZone zone = new("Comfort", 9, sheetsController);
-zone.RefreshInMidnight();
+using var cts = new CancellationTokenSource();
+TelegramBot bot = new("641114157:AAHVLzkTq8QnfXuubRm3zXVM_CMzZQ8QODY",cts);
+bot.Run();
+Console.ReadLine();
 //zone.Refresh();
