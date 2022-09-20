@@ -3,6 +3,17 @@ namespace SheetsController;
 [Serializable]
 public class Reservation
 {
+    public bool InProcess
+    {
+        get;
+        set;
+    }
+
+    public PlayZone Zone
+    {
+        get;
+        set;
+    }
     public GameTable Table { get; set; }
 
     public string AdditionalInfo
@@ -29,5 +40,7 @@ public class Reservation
         StartTime = startTime;
         this.Duration = duration;
         AdditionalInfo = additionalInfo;
+        InProcess = true;
+        Zone = table.Zone;
     }
 }

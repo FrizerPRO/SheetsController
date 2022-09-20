@@ -26,6 +26,8 @@ public class User
     {
         Nickname = nickname;
         this.Reservations = new List<Reservation>();
+        var templeUser = UserControl.DeserializeUser(this);
+        Reservations = templeUser.Reservations;
     }
     public User()
     {

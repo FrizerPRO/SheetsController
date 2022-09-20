@@ -325,17 +325,24 @@ public static class TelegramBotController
         string nickname = update.Message!.Chat.Username!;
         string additionalInfo = "";
         User user = new User(nickname);
-        Reservation reservation;
+        Reservation? reservation = user.Reservations.Find((reservation1 => reservation1.InProcess));
+        if (reservation == null)
+            reservation = new Reservation(new GameTable(), TimeSpan.FromHours(-1), TimeSpan.FromHours(-1), "");
         if (update.Type == UpdateType.CallbackQuery)
         {
-            var updateType = update.CallbackQuery.Data.Split()[0];
-            switch (updateType)
+            var updateData = update.CallbackQuery.Data.Split(" ",StringSplitOptions.RemoveEmptyEntries);
+            switch (updateData[0])
             {
                 case "Main":
                     await CallMain(botClient, update, cancellationToken, user);
                     break;
                 case "PlayZone":
-                            
+                {
+                    if (updateData.Length > 0)
+                    {
+                        reservation.
+                    }
+                } 
                         
             }
         }
