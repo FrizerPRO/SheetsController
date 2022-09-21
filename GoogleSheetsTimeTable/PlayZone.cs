@@ -21,7 +21,7 @@ public class PlayZone
     public string Name { get; set; }
     public int Capacity { get; set; }
 
-    public void RefreshInMidnight()
+    public async Task RefreshInMidnight()
     {
         var rowToRenewFrom = (SheetsController.TotalRows + 1) / 2 + 1;
         var range = Name + "!";
@@ -29,10 +29,10 @@ public class PlayZone
             $"{SheetsController.GetColumnName(2)}{rowToRenewFrom}:" +
             $"{SheetsController.GetColumnName(Capacity + 1)}" +
             $"{SheetsController.TotalRows}";
-        var valuesToUpdate = SheetsController.GetValuesFromRange(range, DataBase.SpreadSheetId)
+        var valuesToUpdate = await SheetsController.GetValuesFromRange(range, DataBase.SpreadSheetId)
                              ?? new List<IList<object>>();
         var requests = new List<Request>();
-        Refresh();
+        await Refresh();
         var turnedValues = TurnValues(valuesToUpdate, Capacity, rowToRenewFrom);
 
         for (var i = 0; i < Capacity; i++)
@@ -54,18 +54,17 @@ public class PlayZone
             Console.WriteLine();
             var values = SheetsController.GetFreeTables(this, durationInTime,
                 i + 1);
-            //TODO: Renew additional info also.
             var allValues = turnedValues[i][j - 1].ToString()!
                 .Split("::->", StringSplitOptions.RemoveEmptyEntries);
             var nickname = allValues[0];
             var additionalInfo = "";
             if (allValues.Length > 1)
                 additionalInfo = allValues[1];
-            UserControl.AddReservation(new User(nickname), values, startTime,
+            await UserControl.AddReservation(new User(nickname), await values, startTime,
                 durationInTime, additionalInfo, i + 1);
         }
 
-        SheetsController.FillCells(requests, DataBase.SpreadSheetId);
+        await SheetsController.FillCells(requests, DataBase.SpreadSheetId);
     }
 
 
@@ -92,7 +91,7 @@ public class PlayZone
         return res;
     }
 
-    public void Refresh()
+    public async Task Refresh()
     {
         var requests = new List<Request>();
         for (var i = 1; i <= Capacity + 1; i++)
@@ -101,10 +100,9 @@ public class PlayZone
             var range = SheetsController.GetRangeForSingleCell(i, j, _sheet);
             var text = GetCellTextForRefreshing(i - 1, j);
             var cell = SheetsController.CreateCell(text, new CellFormat());
-            requests.Add(SheetsController.GetRequestToFill(range, cell));
+            requests.Add(await SheetsController.GetRequestToFill( range.Result, cell.Result));
         }
-
-        SheetsController.FillCells(requests, DataBase.SpreadSheetId);
+        await SheetsController.FillCells(requests, DataBase.SpreadSheetId);
     }
 
     private static string GetCellTextForRefreshing(int i, int j)
@@ -126,13 +124,13 @@ public class PlayZone
         return text;
     }
 
-    public void CancelReservation(Reservation reservation)
+    public async Task CancelReservation(Reservation reservation)
     {
         var requests = new List<Request>();
         var range = SheetsController.GetRangeForFillingTables(reservation.Table, reservation.StartTime,
             reservation.Duration);
         var cell = SheetsController.CreateCell(string.Empty, new CellFormat());
-        requests.Add(SheetsController.GetRequestToFill(range, cell));
-        SheetsController.FillCells(requests, DataBase.SpreadSheetId);
+        requests.Add(await SheetsController.GetRequestToFill(range.Result, cell.Result));
+        await SheetsController.FillCells(requests, DataBase.SpreadSheetId);
     }
 }

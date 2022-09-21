@@ -12,7 +12,7 @@ public static class UserControl
         var fileName = user.Nickname + ".json";
         var totalPath = Folder + fileName;
         var json = JsonSerializer.Serialize(user);
-        File.WriteAllText(totalPath, json);
+        await File.WriteAllTextAsync(totalPath, json);
     }
 
     public static async Task<User> DeserializeUser(User user)
@@ -21,12 +21,12 @@ public static class UserControl
         var totalPath = Folder + fileName;
         if (!File.Exists(totalPath))
         {
-            SerializeUser(user);
+            await SerializeUser(user);
             return user;
         }
 
-        var json = File.ReadAllText(totalPath);
-        var result = JsonSerializer.Deserialize<User>(json);
+        var json = File.ReadAllTextAsync(totalPath);
+        var result = JsonSerializer.Deserialize<User>(json.Result);
         return result!;
     }
 
@@ -34,7 +34,8 @@ public static class UserControl
     {
         var directoryInfo = new DirectoryInfo(Folder);
         var files = directoryInfo.GetFiles("*.json");
-        foreach (var file in files) RenewForSingleUser(new User(Path.GetFileNameWithoutExtension(file.Name)));
+        
+        foreach (var file in files) await RenewForSingleUser(new User(Path.GetFileNameWithoutExtension(file.Name))); 
     }
 
     private static async Task RenewForSingleUser(User user)
@@ -45,7 +46,7 @@ public static class UserControl
             if (reservation.StartTime + reservation.Duration >= DateTime.Now - DateTime.Now.Date)
                 resulReservations.Add(reservation);
         user.Reservations = resulReservations;
-        SerializeUser(user);
+        await SerializeUser(user);
     }
 
     public static async Task<bool> AddReservation(User user, List<GameTable> tables, TimeSpan startTime,
@@ -54,12 +55,12 @@ public static class UserControl
         user = await DeserializeUser(user);
         if (tables.Count == 0)
             return false;
-        var res = SheetsController.TrySetFreeTime(tables, startTime, user.Nickname, duration, tables[0].Zone,
+        Reservation? res = await SheetsController.TrySetFreeTime(tables, startTime, user.Nickname, duration, tables[0].Zone,
             additionalInfo, tableNumber);
         if (res == null)
             return false;
         user.Reservations.Add(res);
-        SerializeUser(user);
+        await SerializeUser(user);
         return true;
     }
 
@@ -69,7 +70,7 @@ public static class UserControl
         var resToAddInfo = user.Reservations.Find(reservation1 => reservation1.InProcess);
         if (resToAddInfo != null) user.Reservations.Remove(resToAddInfo);
         user.Reservations.Add(reservation);
-        SerializeUser(user);
+        await SerializeUser(user);
         return true;
     }
 
@@ -77,12 +78,12 @@ public static class UserControl
     {
         user = await DeserializeUser(user);
         user.Reservations.Remove(reservation);
-        reservation.Table.Zone.CancelReservation(reservation);
-        SerializeUser(user);
+        await reservation.Table.Zone.CancelReservation(reservation);
+        await SerializeUser(user);
         return user;
     }
 
-    public static async Task DeleteJsonUser(User user)
+    public static void DeleteJsonUser(User user)
     {
         var fileName = user.Nickname + ".json";
         var totalPath = Folder + fileName;
@@ -90,7 +91,7 @@ public static class UserControl
             File.Delete(totalPath);
     }
 
-    public static async Task DeleteAllUsersJson()
+    public static void DeleteAllUsersJson()
     {
         var directoryInfo = new DirectoryInfo(Folder);
         var files = directoryInfo.GetFiles("*.json");

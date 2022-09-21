@@ -24,7 +24,7 @@ public static class SheetsController
     {
         Service = new SheetsService(new BaseClientService.Initializer
         {
-            HttpClientInitializer = GetCredential(),
+            HttpClientInitializer = GetCredential().Result,
             ApplicationName = ApplicationName
         });
     }
@@ -55,47 +55,25 @@ public static class SheetsController
             return result;
         }
     }
-
-    public static void Test()
-    {
-        PlayZone zone = new("Comfort", 9);
-        //zone.RefreshInMidnight();
-        //zone.Refresh();
-        var duration = TimeSpan.FromHours(1);
-        var tableNumber = 6;
-        var values = GetFreeTables(zone, duration, tableNumber);
-        foreach (var i in values)
-        foreach (var j in i.FreeTime)
-            Console.WriteLine(j.ToString());
-        var startTime = TimeSpan.FromHours(16);
-        var nickname = "Peter";
-        var user = new User(nickname);
-        UserControl.AddReservation(user, values, startTime, duration, "", tableNumber);
-        // user = await UserControl.DeserializeUser(user);
-        //UserControl.AddReservation(user, values, startTime, duration, tableNumber);
-        //Console.WriteLine(user.Reservations.Count);
-        //UserControl.RemoveReservation(user,user.Reservations[0]);
-        //zone.RefreshInMidnight();
-    }
-
-    public static Reservation TrySetFreeTime(List<GameTable> values, TimeSpan startTime, string nickname,
+    
+    public static async Task<Reservation?> TrySetFreeTime(List<GameTable> values, TimeSpan startTime, string nickname,
         TimeSpan duration, PlayZone zone, string additionalInfo, int tableNumber = -1)
     {
-        var valuesToCompare = GetFreeTables(zone, duration, tableNumber);
+        var valuesToCompare = await GetFreeTables(zone, duration, tableNumber);
         if (valuesToCompare.Find(table => table.FreeTime.Contains(startTime)) == null)
             return null;
-        return SetFreeTime(values, startTime, nickname, duration, additionalInfo);
+        return await SetFreeTime(values, startTime, nickname, duration, additionalInfo);
     }
 
-    public static List<GameTable> GetFreeTables(PlayZone zone, TimeSpan duration, int tableNumber = -1)
+    public static async Task<List<GameTable>> GetFreeTables(PlayZone zone, TimeSpan duration, int tableNumber = -1)
     {
-        var values = GetTable(GetRange(zone, tableNumber));
-        values = ChangeTimeForFree(values, duration);
-        CheckForTimeCapableToNow(values);
+        var values =await  GetTable(await GetRange(zone, tableNumber));
+        values =await  ChangeTimeForFree(values, duration);
+        await CheckForTimeCapableToNow(values);
         return values;
     }
 
-    private static void CheckForTimeCapableToNow(List<GameTable> values)
+    private static async Task CheckForTimeCapableToNow(List<GameTable> values)
     {
         values.ForEach(table =>
         {
@@ -109,7 +87,7 @@ public static class SheetsController
         });
     }
 
-    public static List<TimeSpan> GetAllFreeTimeSpans(List<GameTable> gameTables)
+    public static async Task<List<TimeSpan>> GetAllFreeTimeSpans(List<GameTable> gameTables)
     {
         List<TimeSpan> result = new();
         foreach (var table in gameTables)
@@ -120,35 +98,35 @@ public static class SheetsController
         return result;
     }
 
-    private static UserCredential GetCredential()
+    private static async Task<UserCredential> GetCredential()
     {
         using var stream =
             new FileStream("../../../../ConsoleApp1/Credential/credentials.json", FileMode.Open, FileAccess.Read);
         /* The file token.json stores the user's access and refresh tokens, and is created
              automatically when the authorization flow completes for the first time. */
         return GoogleWebAuthorizationBroker.AuthorizeAsync(
-            GoogleClientSecrets.FromStream(stream).Secrets,
+            GoogleClientSecrets.FromStreamAsync(stream).Result.Secrets,
             Scopes,
             "user",
             CancellationToken.None).Result;
     }
 
-    public static GameTable? GetFreeTable(List<GameTable> tables, TimeSpan userTime)
+    public static async Task<GameTable?> GetFreeTable(List<GameTable> tables, TimeSpan userTime)
     {
         GameTable? resultTable = null;
         foreach (var table in tables.Where(table => table.FreeTime.Contains(userTime))) resultTable = table;
         return resultTable;
     }
 
-    private static Reservation? SetFreeTime(List<GameTable> tables, TimeSpan userTime, string nickname,
+    private static async Task<Reservation?> SetFreeTime(List<GameTable> tables, TimeSpan userTime, string nickname,
         TimeSpan duration, string additionalInfo)
     {
         GameTable? resultTable = null;
         foreach (var table in tables.Where(table => table.FreeTime.Contains(userTime))) resultTable = table;
         if (resultTable == null)
             return null;
-        var range = GetRangeForFillingTables(resultTable, userTime, duration);
-        var cell = CreateCell(additionalInfo == "" ? nickname : nickname + "::->" + additionalInfo, new CellFormat
+        var range = await GetRangeForFillingTables(resultTable, userTime, duration);
+        var cell = await CreateCell(additionalInfo == "" ? nickname : nickname + "::->" + additionalInfo, new CellFormat
         {
             BackgroundColor = new Color
             {
@@ -165,17 +143,16 @@ public static class SheetsController
         Console.WriteLine(cell.ToString());
         var requests = new List<Request>
         {
-            GetRequestToFill(range, cell)
+            await GetRequestToFill(range, cell)
         };
-        FillCells(requests, DataBase.SpreadSheetId);
-
+        await FillCells(requests, DataBase.SpreadSheetId);
         return new Reservation(resultTable, userTime, duration, additionalInfo)
         {
             InProcess = false
         };
     }
 
-    internal static void FillCells( /*Data.GridRange range, Data.CellData cell,string spreadSheetId*/
+    internal static async Task FillCells( /*Data.GridRange range, Data.CellData cell,string spreadSheetId*/
         List<Request> requests, string spreadSheetId)
     {
         if (requests.Count == 0)
@@ -188,7 +165,7 @@ public static class SheetsController
         bur.Execute();
     }
 
-    internal static Request GetRequestToFill(GridRange range, CellData cell)
+    internal static async Task<Request> GetRequestToFill(GridRange range, CellData cell)
     {
         var updateCellsRequest = new Request
         {
@@ -202,7 +179,7 @@ public static class SheetsController
         return updateCellsRequest;
     }
 
-    internal static CellData CreateCell(string text,
+    internal static async Task<CellData> CreateCell(string text,
         CellFormat cellFormat)
     {
         var userEnteredFormat = cellFormat;
@@ -217,7 +194,7 @@ public static class SheetsController
         return cell;
     }
 
-    internal static GridRange GetRangeForFillingTables(GameTable table, TimeSpan startTime, TimeSpan duration)
+    internal static async Task<GridRange> GetRangeForFillingTables(GameTable table, TimeSpan startTime, TimeSpan duration)
     {
         var spr = Service.Spreadsheets.Get(DataBase.SpreadSheetId).Execute();
         var sh = spr.Sheets.FirstOrDefault(s => s.Properties.Title ==
@@ -234,7 +211,7 @@ public static class SheetsController
         };
     }
 
-    public static GridRange GetRangeForSingleCell(int startColumn, int startRow, Sheet sheet)
+    public static async Task<GridRange> GetRangeForSingleCell(int startColumn, int startRow, Sheet sheet)
     {
         var sheetId = (int)sheet.Properties.SheetId!;
         return new GridRange
@@ -247,7 +224,7 @@ public static class SheetsController
         };
     }
 
-    private static List<GameTable> GetRange(PlayZone zone, int tableNumber = -1)
+    private static async Task<List<GameTable>> GetRange(PlayZone zone, int tableNumber = -1)
     {
         List<GameTable> tables = new();
 
@@ -264,7 +241,7 @@ public static class SheetsController
         return tables;
     }
 
-    private static List<GameTable> ChangeTimeForFree(List<GameTable> tables, TimeSpan duration)
+    private static async Task<List<GameTable>> ChangeTimeForFree(List<GameTable> tables, TimeSpan duration)
     {
         foreach (var table in tables)
         {
@@ -272,24 +249,24 @@ public static class SheetsController
             if (table.GetTimeTable().Count == 0)
             {
                 var freeTime = TotalDuration + MinimumStep;
-                table.FreeTime.AddRange(GetAllFreeCells(freeTime,
+                table.FreeTime.AddRange(await GetAllFreeCells(freeTime,
                     duration, TotalDuration + MinimumStep));
             }
             else
             {
                 if (tableArray[0].Key >= duration)
-                    table.FreeTime.AddRange(GetAllFreeCells(tableArray[0].Key, duration,
+                    table.FreeTime.AddRange(await GetAllFreeCells(tableArray[0].Key, duration,
                         tableArray[0].Key));
                 for (var i = 1; i < tableArray.Length; i++)
                 {
                     var localDuration = tableArray[i].Key - tableArray[i - 1].Key - MinimumStep;
                     if (localDuration >= duration)
-                        table.FreeTime.AddRange(GetAllFreeCells(localDuration, duration,
+                        table.FreeTime.AddRange(await GetAllFreeCells(localDuration, duration,
                             tableArray[i].Key));
                 }
 
                 if (TotalDuration - tableArray[^1].Key >= duration)
-                    table.FreeTime.AddRange(GetAllFreeCells(TotalDuration - tableArray[^1].Key,
+                    table.FreeTime.AddRange(await GetAllFreeCells(TotalDuration - tableArray[^1].Key,
                         duration, TotalDuration + MinimumStep));
             }
 
@@ -299,7 +276,7 @@ public static class SheetsController
         return tables;
     }
 
-    private static List<TimeSpan> GetAllFreeCells(TimeSpan maxDuration, TimeSpan duration, TimeSpan endTime)
+    private static async Task<List<TimeSpan>> GetAllFreeCells(TimeSpan maxDuration, TimeSpan duration, TimeSpan endTime)
     {
         var localTime = endTime - duration;
         List<TimeSpan> result = new();
@@ -313,11 +290,11 @@ public static class SheetsController
         return result;
     }
 
-    private static List<GameTable> GetTable(List<GameTable> rangeOfTables)
+    private static async Task<List<GameTable>> GetTable(List<GameTable> rangeOfTables)
     {
         foreach (var table in rangeOfTables)
         {
-            var values = GetValuesFromRange(table.Range, DataBase.SpreadSheetId);
+            var values = await GetValuesFromRange(table.Range, DataBase.SpreadSheetId);
             TimeSpan counter = new();
             if (values == null)
                 return rangeOfTables;
@@ -334,7 +311,7 @@ public static class SheetsController
         return rangeOfTables;
     }
 
-    internal static IList<IList<object>>? GetValuesFromRange(string range, string spreadsheetId)
+    internal static async Task<IList<IList<object>>?> GetValuesFromRange(string range, string spreadsheetId)
     {
         var request =
             Service.Spreadsheets.Values.Get(spreadsheetId, range);
