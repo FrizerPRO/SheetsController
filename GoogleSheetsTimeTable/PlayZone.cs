@@ -4,6 +4,8 @@ namespace SheetsController;
 
 public class PlayZone
 {
+    private readonly Sheet _sheet;
+
     public PlayZone(string name, int capacity)
     {
         Name = name;
@@ -12,17 +14,16 @@ public class PlayZone
         _sheet = spr.Sheets.FirstOrDefault(s => s.Properties.Title == Name)!;
     }
 
-    public string Name { get; set; }
-    public int Capacity { get; set; }
-
-    private readonly Sheet _sheet;
-
     public PlayZone()
     {
     }
+
+    public string Name { get; set; }
+    public int Capacity { get; set; }
+
     public void RefreshInMidnight()
     {
-        int rowToRenewFrom = (SheetsController.TotalRows + 1) / 2 + 1;
+        var rowToRenewFrom = (SheetsController.TotalRows + 1) / 2 + 1;
         var range = Name + "!";
         range +=
             $"{SheetsController.GetColumnName(2)}{rowToRenewFrom}:" +
@@ -32,70 +33,62 @@ public class PlayZone
                              ?? new List<IList<object>>();
         var requests = new List<Request>();
         Refresh();
-        var turnedValues = TurnValues(valuesToUpdate,Capacity,rowToRenewFrom);
-        
-        for (var i = 0; i < Capacity; i++)
-        {
-            for (var j = 0; j < rowToRenewFrom; j++)
-            {
-                int duration = 0;
-                while (j < rowToRenewFrom && turnedValues[i][j].ToString() != string.Empty)
-                {
-                    duration++;
-                    j++;
-                }
-                
-                if (duration <= 0) continue;
+        var turnedValues = TurnValues(valuesToUpdate, Capacity, rowToRenewFrom);
 
-                TimeSpan startTime = SheetsController.TimeToRowNumber.FirstOrDefault(
-                    item => item.Value == j - duration + 2).Key;
-                TimeSpan durationInTime = SheetsController.TimeToRowNumber.FirstOrDefault(
-                    item => item.Value == duration + 2).Key;
-                Console.WriteLine();
-                var values = SheetsController.GetFreeTables(this,durationInTime,
-                    i + 1);
-                //TODO: Renew additional info also.
-                var allValues = turnedValues[i][j - 1].ToString()!
-                    .Split("::->", StringSplitOptions.RemoveEmptyEntries);
-                var nickname = allValues[0];
-                var additionalInfo = "";
-                if (allValues.Length > 1)
-                    additionalInfo = allValues[1];
-                UserControl.AddReservation(new User(nickname), values,startTime,
-                    durationInTime,additionalInfo ,i + 1);
+        for (var i = 0; i < Capacity; i++)
+        for (var j = 0; j < rowToRenewFrom; j++)
+        {
+            var duration = 0;
+            while (j < rowToRenewFrom && turnedValues[i][j].ToString() != string.Empty)
+            {
+                duration++;
+                j++;
             }
+
+            if (duration <= 0) continue;
+
+            var startTime = SheetsController.TimeToRowNumber.FirstOrDefault(
+                item => item.Value == j - duration + 2).Key;
+            var durationInTime = SheetsController.TimeToRowNumber.FirstOrDefault(
+                item => item.Value == duration + 2).Key;
+            Console.WriteLine();
+            var values = SheetsController.GetFreeTables(this, durationInTime,
+                i + 1);
+            //TODO: Renew additional info also.
+            var allValues = turnedValues[i][j - 1].ToString()!
+                .Split("::->", StringSplitOptions.RemoveEmptyEntries);
+            var nickname = allValues[0];
+            var additionalInfo = "";
+            if (allValues.Length > 1)
+                additionalInfo = allValues[1];
+            UserControl.AddReservation(new User(nickname), values, startTime,
+                durationInTime, additionalInfo, i + 1);
         }
 
         SheetsController.FillCells(requests, DataBase.SpreadSheetId);
     }
-    
 
-    private IList<IList<object>> TurnValues(IList<IList<object>> valuesToUpdate,int capacity,int rowToRenewFrom)
+
+    private IList<IList<object>> TurnValues(IList<IList<object>> valuesToUpdate, int capacity, int rowToRenewFrom)
     {
         var res = new List<IList<object>>();
-        res.AddRange(Enumerable.Repeat(new List<object>(),capacity));
-        for (int i = 0; i < capacity; i++)
+        res.AddRange(Enumerable.Repeat(new List<object>(), capacity));
+        for (var i = 0; i < capacity; i++)
         {
             res[i] = new List<object>();
-            for (int j = 0; j < rowToRenewFrom; j++)
-            {
-                res[i].Add( (object)string.Empty);
-            }
+            for (var j = 0; j < rowToRenewFrom; j++) res[i].Add(string.Empty);
         }
 
         for (var i = 0; i < rowToRenewFrom; i++)
-        {
-            for (var j = 0; j < Capacity; j++)
+        for (var j = 0; j < Capacity; j++)
+            if (valuesToUpdate.Count > i &&
+                valuesToUpdate[i].Count > j &&
+                valuesToUpdate[i][j].ToString() != string.Empty)
             {
-                if ((valuesToUpdate.Count > i) &&
-                    (valuesToUpdate[i].Count > j) && 
-                    (valuesToUpdate[i][j].ToString() != string.Empty))
-                {
-                    res[j][i] = valuesToUpdate[i][j];
-                    Console.WriteLine(valuesToUpdate[i][j].ToString() + " i: " + i+" j: " + j);
-                }
+                res[j][i] = valuesToUpdate[i][j];
+                Console.WriteLine(valuesToUpdate[i][j] + " i: " + i + " j: " + j);
             }
-        }
+
         return res;
     }
 
