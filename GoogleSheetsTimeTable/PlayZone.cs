@@ -4,13 +4,10 @@ namespace SheetsController;
 
 public class PlayZone
 {
-    public SheetsController SheetsController { get; set; }
-
-    public PlayZone(string name, int capacity, SheetsController sheetsController)
+    public PlayZone(string name, int capacity)
     {
         Name = name;
         Capacity = capacity;
-        SheetsController = sheetsController;
         var spr = SheetsController.Service.Spreadsheets.Get(DataBase.SpreadSheetId).Execute();
         _sheet = spr.Sheets.FirstOrDefault(s => s.Properties.Title == Name)!;
     }

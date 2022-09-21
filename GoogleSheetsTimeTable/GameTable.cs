@@ -13,7 +13,27 @@ public class GameTable
         get;
         set;
     }
-    public Dictionary<TimeSpan, string> TimeTable
+
+    public Dictionary<TimeSpan, string> GetTimeTable()
+    {
+        Dictionary<TimeSpan, string> result = new();
+        foreach (var i in TimeTableString)
+        {
+            result[TimeSpan.Parse(i.Key)] = i.Value;
+        }
+
+        return result;
+    }
+
+    public void SetTimeTable(Dictionary<TimeSpan, string> value)
+    {
+        foreach (var i in value)
+        {
+            TimeTableString[i.Key.ToString()] = i.Value;
+        }
+    }
+
+    public Dictionary<string, string> TimeTableString
     {
         get;
         set;
@@ -26,7 +46,7 @@ public class GameTable
 
     public GameTable()
     {
-        TimeTable = new Dictionary<TimeSpan, string>();
+        TimeTableString = new Dictionary<string, string>();
         FreeTime = new List<TimeSpan>();
         Zone = new PlayZone();
     }
@@ -34,9 +54,9 @@ public class GameTable
     {
         Zone = zone;
         Number = number;
-        TimeTable = new Dictionary<TimeSpan, string>();
         FreeTime = new List<TimeSpan>();
-        
+        TimeTableString = new Dictionary<string, string>();
+
     }
 
     public string Range

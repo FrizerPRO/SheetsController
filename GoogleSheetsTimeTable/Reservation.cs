@@ -22,14 +22,8 @@ public class Reservation
         set;
     }
 
-    public int TableNumber
-    {
-        get;
-        set;
-    }
     public TimeSpan StartTime { get; set; }
     public TimeSpan Duration { get; set; }
-
     public override bool Equals(object? obj)
     {
         var res = (Reservation)obj!;

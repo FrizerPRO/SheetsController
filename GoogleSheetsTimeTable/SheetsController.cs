@@ -6,7 +6,7 @@ using Google.Apis.Sheets.v4.Data;
 
 namespace SheetsController;
 [Serializable]
-public class SheetsController
+public static class SheetsController
 {
     public static readonly TimeSpan MinimumStep = TimeSpan.FromMinutes(30);
 
@@ -14,8 +14,7 @@ public class SheetsController
     public static readonly TimeSpan MaxReservationDuration = TimeSpan.FromHours(5);
 
     private static readonly string ApplicationName = "DICK";
-
-    protected internal static readonly SheetsService Service;
+    internal static readonly SheetsService Service;
     private static readonly string[] Scopes = { SheetsService.Scope.Spreadsheets };
 
     //public static string SpreadsheetId => DataBase.SpreadSheetId;
@@ -29,9 +28,8 @@ public class SheetsController
             ApplicationName = ApplicationName
         });
     }
-    
 
-    protected internal static int TotalRows
+    internal static int TotalRows
     {
         get
         {
@@ -46,8 +44,7 @@ public class SheetsController
             return counter;
         }
     }
-
-    protected internal static Dictionary<TimeSpan, int> TimeToRowNumber
+    internal static Dictionary<TimeSpan, int> TimeToRowNumber
     {
         get
         {
@@ -58,27 +55,33 @@ public class SheetsController
         }
     }
 
-    public void Test()
+    public static void Test()
     {
-        PlayZone zone = new("Comfort", 9, this);
+        PlayZone zone = new("Comfort", 9);
         //zone.RefreshInMidnight();
         //zone.Refresh();
         var duration = TimeSpan.FromHours(1);
-        var tableNumber = 5;
+        var tableNumber = 6;
         var values = GetFreeTables(zone, duration, tableNumber);
-
-        var startTime = TimeSpan.FromHours(11);
+        foreach (var i in values)
+        {
+            foreach (var j in i.FreeTime)
+            {
+                Console.WriteLine(j.ToString());
+            }
+        }
+        var startTime = TimeSpan.FromHours(16);
         var nickname = "Peter";
         User user = new User(nickname);
-        //UserControl.AddReservation(user,values,startTime,duration,tableNumber);
-        user = UserControl.DeserializeUser(user);
+        UserControl.AddReservation(user,values,startTime,duration,"",tableNumber);
+       // user = await UserControl.DeserializeUser(user);
         //UserControl.AddReservation(user, values, startTime, duration, tableNumber);
-        Console.WriteLine(user.Reservations.Count);
+        //Console.WriteLine(user.Reservations.Count);
         //UserControl.RemoveReservation(user,user.Reservations[0]);
-        zone.RefreshInMidnight();
+        //zone.RefreshInMidnight();
     }
 
-    public Reservation? TrySetFreeTime(List<GameTable> values, TimeSpan startTime, string nickname,
+    public static Reservation TrySetFreeTime(List<GameTable> values, TimeSpan startTime, string nickname,
         TimeSpan duration, PlayZone zone,string additionalInfo, int tableNumber = -1)
     {
         var valuesToCompare = GetFreeTables(zone, duration, tableNumber);
@@ -138,7 +141,13 @@ public class SheetsController
             CancellationToken.None).Result;
     }
 
-    private Reservation? SetFreeTime(List<GameTable> tables, TimeSpan userTime, string nickname, TimeSpan duration,string additionalInfo)
+    public static GameTable? GetFreeTable(List<GameTable> tables, TimeSpan userTime)
+    {
+        GameTable? resultTable = null;
+        foreach (var table in tables.Where(table => table.FreeTime.Contains(userTime))) resultTable = table;
+        return resultTable;
+    }
+    private static Reservation? SetFreeTime(List<GameTable> tables, TimeSpan userTime, string nickname, TimeSpan duration,string additionalInfo)
     {
         GameTable? resultTable = null;
         foreach (var table in tables.Where(table => table.FreeTime.Contains(userTime))) resultTable = table;
@@ -167,10 +176,13 @@ public class SheetsController
         };
         FillCells(requests, DataBase.SpreadSheetId);
         
-        return new Reservation(resultTable,userTime,duration,additionalInfo);
+        return new Reservation(resultTable,userTime,duration,additionalInfo)
+        {
+            InProcess = false
+        };
     }
 
-    protected internal static void FillCells( /*Data.GridRange range, Data.CellData cell,string spreadSheetId*/
+     internal static void FillCells( /*Data.GridRange range, Data.CellData cell,string spreadSheetId*/
         List<Request> requests, string spreadSheetId)
     {
         if(requests.Count == 0)
@@ -183,7 +195,7 @@ public class SheetsController
         bur.Execute();
     }
 
-    protected internal static Request GetRequestToFill(GridRange range, CellData cell)
+     internal static Request GetRequestToFill(GridRange range, CellData cell)
     {
         var updateCellsRequest = new Request
         {
@@ -197,7 +209,7 @@ public class SheetsController
         return updateCellsRequest;
     }
 
-    protected internal static CellData CreateCell(string text,
+     internal static CellData CreateCell(string text,
         CellFormat cellFormat)
     {
         var userEnteredFormat = cellFormat;
@@ -211,8 +223,7 @@ public class SheetsController
         };
         return cell;
     }
-
-    protected internal GridRange GetRangeForFillingTables(GameTable table, TimeSpan startTime, TimeSpan duration)
+    static internal GridRange GetRangeForFillingTables(GameTable table, TimeSpan startTime, TimeSpan duration)
     {
         var spr = Service.Spreadsheets.Get(DataBase.SpreadSheetId).Execute();
         var sh = spr.Sheets.FirstOrDefault(s => s.Properties.Title ==
@@ -264,8 +275,8 @@ public class SheetsController
     {
         foreach (var table in tables)
         {
-            var tableArray = table.TimeTable.ToArray();
-            if (table.TimeTable.Count == 0)
+            var tableArray = table.GetTimeTable().ToArray();
+            if (table.GetTimeTable().Count == 0)
             {
                 var freeTime = TotalDuration + MinimumStep;
                 table.FreeTime.AddRange(GetAllFreeCells(freeTime,
@@ -321,15 +332,17 @@ public class SheetsController
             foreach (var timeColumn in values)
             {
                 for (var i = 0; i < timeColumn.Count; i++)
-                    if (timeColumn[i]!=new Object())
-                        table.TimeTable[counter] = timeColumn[i].ToString()!;
+                    if (timeColumn[i] != new Object())
+                    {
+                        table.TimeTableString[counter.ToString()] = timeColumn[i].ToString()!;
+                    }
                 counter += MinimumStep;
             }
+            
         }
-
         return rangeOfTables;
     }
-    protected internal static IList<IList<object>>? GetValuesFromRange(string range, string spreadsheetId)
+     internal static IList<IList<object>>? GetValuesFromRange(string range, string spreadsheetId)
     {
         
         var request =

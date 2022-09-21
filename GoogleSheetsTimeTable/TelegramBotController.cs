@@ -4,6 +4,7 @@ using Google.Apis.Sheets.v4.Data;
 using SheetsController;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
+using Telegram.Bot.Requests;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -15,7 +16,7 @@ public static class TelegramBotController
 {
     private static readonly string FolderWithText = "../../../../ConsoleApp1/TextForMessages/";
 
-    public static InlineKeyboardMarkup GetMainTab(User user)
+    public static async Task<InlineKeyboardMarkup> GetMainTab(User user)
     {
         List<IList<InlineKeyboardButton>> result = new();
         result.Add(new[]
@@ -33,7 +34,7 @@ public static class TelegramBotController
         return new InlineKeyboardMarkup(result);
     }
 
-    public static InlineKeyboardMarkup GetZonesTab(List<PlayZone> zones)
+    public static async Task<InlineKeyboardMarkup> GetZonesTab(List<PlayZone> zones)
     {
         List<IList<InlineKeyboardButton>> result = new();
         var counter = 0;
@@ -54,7 +55,7 @@ public static class TelegramBotController
         return new InlineKeyboardMarkup(result);
     }
 
-    public static InlineKeyboardMarkup GetTableNumber(int amountOfTables)
+    public static async Task<InlineKeyboardMarkup> GetTableNumber(int amountOfTables)
     {
         List<IList<InlineKeyboardButton>> result = new();
         result.Add(new[]
@@ -79,10 +80,10 @@ public static class TelegramBotController
         return new InlineKeyboardMarkup(result);
     }
 
-    public static InlineKeyboardMarkup GetDurationTab()
+    public static async Task<InlineKeyboardMarkup> GetDurationTab()
     {
         List<IList<InlineKeyboardButton>> result = new();
-        for (var i = TimeSpan.Zero; i <= SheetsController.SheetsController.MaxReservationDuration;)
+        for (var i = SheetsController.SheetsController.MinimumStep; i <= SheetsController.SheetsController.MaxReservationDuration;)
         {
             List<InlineKeyboardButton> tableNumbers = new();
             for (var j = 0;
@@ -103,7 +104,7 @@ public static class TelegramBotController
         return new InlineKeyboardMarkup(result);
     }
 
-    public static InlineKeyboardMarkup GetFreeTimeTab(List<GameTable> gameTables)
+    public static async Task<InlineKeyboardMarkup> GetFreeTimeTab(List<GameTable> gameTables)
     {
         List<IList<InlineKeyboardButton>> result = new();
         var allFreeTime = SheetsController.SheetsController.GetAllFreeTimeSpans(gameTables);
@@ -126,7 +127,7 @@ public static class TelegramBotController
         return new InlineKeyboardMarkup(result);
     }
 
-    public static InlineKeyboardMarkup GetIfNeedsAdditionalInfoTab()
+    public static async Task<InlineKeyboardMarkup> GetIfNeedsAdditionalInfoTab()
     {
         List<IList<InlineKeyboardButton>> result = new();
         result.Add(new[]
@@ -145,7 +146,7 @@ public static class TelegramBotController
         return new InlineKeyboardMarkup(result);
     }
 
-    public static InlineKeyboardMarkup GetConformationTab()
+    public static async Task<InlineKeyboardMarkup> GetConformationTab()
     {
         List<IList<InlineKeyboardButton>> result = new();
         result.Add(new[]
@@ -159,21 +160,22 @@ public static class TelegramBotController
         return new InlineKeyboardMarkup(result);
     }
 
-    public static InlineKeyboardMarkup GetReservationInfoTab()
+    public static async Task<InlineKeyboardMarkup> GetReservationInfoTab(int indexOfReservation)
     {
         List<IList<InlineKeyboardButton>> result = new();
         result.Add(new[]
         {
-            InlineKeyboardButton.WithCallbackData(text: "Отменить", callbackData: "CancelReservation"),
+            InlineKeyboardButton.WithCallbackData(text: "Отменить",
+                callbackData: $"CancelReservation {indexOfReservation}"),
         });
         result.Add(new[]
         {
-            InlineKeyboardButton.WithCallbackData(text: "Назад", callbackData: "Reservations"),
+            InlineKeyboardButton.WithCallbackData(text: "Назад", callbackData: "Main"),
         });
         return new InlineKeyboardMarkup(result);
     }
 
-    public static InlineKeyboardMarkup GetAllReservationsTab(User user)
+    public static async Task<InlineKeyboardMarkup> GetAllReservationsTab(User user)
     {
         List<IList<InlineKeyboardButton>> result = new();
         var counter = 0;
@@ -182,7 +184,7 @@ public static class TelegramBotController
             result.Add(new[]
             {
                 InlineKeyboardButton.WithCallbackData(text: reservation.StartTime.ToString() +
-                                                            "\n" + reservation.Table.Zone.Name,
+                                                            " " + reservation.Table.Zone.Name,
                     callbackData: $"Reservations {counter.ToString()}"),
             });
             counter++;
@@ -195,7 +197,7 @@ public static class TelegramBotController
         return new InlineKeyboardMarkup(result);
     }
 
-    public static InlineKeyboardMarkup GetBackButtonTab()
+    public static async Task<InlineKeyboardMarkup> GetBackButtonTab()
     {
         List<IList<InlineKeyboardButton>> result = new();
         result.Add(new[]
@@ -205,71 +207,71 @@ public static class TelegramBotController
         return new InlineKeyboardMarkup(result);
     }
 
-    public static Message GetMainMessage(User user)
+    public static async Task<Message> GetMainMessage(User user)
     {
         Message message = new()
         {
-            ReplyMarkup = GetMainTab(user),
+            ReplyMarkup = await GetMainTab(user),
             Text = File.ReadAllText(FolderWithText + "MainMessageText.txt")
         };
         return message;
     }
 
-    public static Message GetZoneMessage(List<PlayZone> zones)
+    public static async Task<Message> GetZoneMessage(List<PlayZone> zones)
     {
         Message message = new()
         {
-            ReplyMarkup = GetZonesTab(zones),
+            ReplyMarkup = await GetZonesTab(zones),
             Text = File.ReadAllText(FolderWithText + "ZoneMessageText.txt")
         };
         return message;
     }
 
-    public static Message GetTableNumberMessage(int amountOfTables)
+    public static async Task<Message> GetTableNumberMessage(int amountOfTables)
     {
         Message message = new()
         {
-            ReplyMarkup = GetTableNumber(amountOfTables),
+            ReplyMarkup = await GetTableNumber(amountOfTables),
             Text = File.ReadAllText(FolderWithText + "AmountOfTablesMessageText.txt")
         };
         return message;
     }
 
-    public static Message GetDurationMessage()
+    public static async Task<Message> GetDurationMessage()
     {
         Message message = new()
         {
-            ReplyMarkup = GetDurationTab(),
+            ReplyMarkup = await GetDurationTab(),
             Text = File.ReadAllText(FolderWithText + "DurationMessageText.txt")
         };
         return message;
     }
 
-    public static Message GetFreeTimeMessage(List<GameTable> gameTables)
+    public static async Task<Message> GetFreeTimeMessage(List<GameTable> gameTables)
     {
         Message message = new()
         {
-            ReplyMarkup = GetFreeTimeTab(gameTables),
+            ReplyMarkup = await GetFreeTimeTab(gameTables),
             Text = File.ReadAllText(FolderWithText + "FreeTimeMessageText.txt")
         };
         return message;
     }
 
-    public static Message GetIfNeedAdditionalInfoMessage()
+    public static async Task<Message> GetIfNeedAdditionalInfoMessage()
     {
         Message message = new()
         {
-            ReplyMarkup = GetIfNeedsAdditionalInfoTab(),
+            ReplyMarkup = await GetIfNeedsAdditionalInfoTab(),
             Text = File.ReadAllText(FolderWithText + "IfNeedAdditionalInfoMessageText.txt")
         };
         return message;
     }
 
-    public static Message GetConformationMessage(Reservation reservation, User user)
+    public static async Task<Message> GetConformationMessage(Reservation reservation, User user)
     {
         Message message = new()
         {
-            ReplyMarkup = GetConformationTab(),
+            ReplyMarkup = await GetConformationTab(),
             Text = GetReservationInfo(reservation, user)
         };
         return message;
@@ -285,31 +287,31 @@ public static class TelegramBotController
         return result;
     }
 
-    public static Message GetAllReservationsMessage(User user)
+    public static async Task<Message> GetAllReservationsMessage(User user)
     {
         Message message = new()
         {
-            ReplyMarkup = GetAllReservationsTab(user),
+            ReplyMarkup = await GetAllReservationsTab(user),
             Text = File.ReadAllText(FolderWithText + "AllReservationsMessageText.txt")
         };
         return message;
     }
 
-    public static Message GetReservationInfoMessage(Reservation reservation, User user)
+    public static async Task<Message> GetReservationInfoMessage(Reservation reservation, User user)
     {
         Message message = new()
         {
-            ReplyMarkup = GetReservationInfoTab(),
+            ReplyMarkup = await GetReservationInfoTab(user.Reservations.IndexOf(reservation)),
             Text = GetReservationInfo(reservation, user)
         };
         return message;
     }
 
-    public static Message GetSetAdditionalInfoMessage()
+    public static async Task<Message> GetSetAdditionalInfoMessage()
     {
         Message message = new()
         {
-            ReplyMarkup = GetBackButtonTab(),
+            ReplyMarkup = await GetBackButtonTab(),
             Text = File.ReadAllText(FolderWithText + "SetAdditionalInfoMessageText.txt")
         };
         return message;
@@ -332,6 +334,7 @@ public static class TelegramBotController
     public async static Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
         CancellationToken cancellationToken)
     {
+        
         string nickname = "EMPTY!!!";
         switch (update.Type)
         {
@@ -354,9 +357,10 @@ public static class TelegramBotController
             var updateData = update.CallbackQuery.Data.Split(" ", StringSplitOptions.RemoveEmptyEntries);
             switch (updateData[0])
             {
+                
                 case "Main":
                     await CallMain(botClient, update, cancellationToken, user);
-                    return;
+                    break;
                 case "PlayZone":
                 {
                     if (updateData.Length > 1)
@@ -368,65 +372,79 @@ public static class TelegramBotController
                     }
 
                     await CallPlayZone(botClient, update, cancellationToken, DataBase.Zones);
-                    return;
+                    break;
                 }
                 case "TableNumber":
                 {
                     if (updateData.Length > 1)
                     {
-                        reservation.TableNumber = int.Parse(updateData[1]);
+                        reservation.Table = new GameTable(reservation.Zone, int.Parse(updateData[1]));
                         UserControl.AddReservation(user, reservation);
                         await CallDuration(botClient, update, cancellationToken);
                         return;
                     }
 
                     await CallTableNumber(botClient, update, cancellationToken, reservation.Zone.Capacity);
-                    return;
+                    break;
                 }
                 case "Duration":
                 {
                     if (updateData.Length > 1)
                     {
                         reservation.Duration = TimeSpan.Parse(updateData[1]);
-                        
+                        var tables = SheetsController.SheetsController.GetFreeTables(reservation.Zone,
+                            reservation.Duration,
+                            reservation.Table.Number);
                         UserControl.AddReservation(user, reservation);
-                        await CallFreeTime(botClient, update, cancellationToken,
-                            SheetsController.SheetsController.GetFreeTables(reservation.Zone, reservation.Duration,
-                                reservation.TableNumber));
+                        await CallFreeTime(botClient, update, cancellationToken, tables);
                         return;
                     }
 
                     await CallDuration(botClient, update, cancellationToken);
-                    return;
+                    break;
                 }
                 case "FreeTime":
                 {
+                    var freeTables = SheetsController.SheetsController.GetFreeTables(reservation.Zone,
+                        reservation.Duration,
+                        reservation.Table.Number);
                     if (updateData.Length > 1)
                     {
                         reservation.StartTime = TimeSpan.Parse(updateData[1]);
+                        var table =
+                            SheetsController.SheetsController.GetFreeTable(freeTables, reservation.StartTime);
+                        if (table == null)
+                        {
+                            await CallFreeTime(botClient, update, cancellationToken, freeTables);
+                            return;
+                        }
+
+                        reservation.Table = table;
                         UserControl.AddReservation(user, reservation);
                         await CallIfNeedAdditionalInfo(botClient, update, cancellationToken);
                         return;
                     }
 
-                    await CallFreeTime(botClient, update, cancellationToken,
-                        SheetsController.SheetsController.GetFreeTables(reservation.Zone, reservation.Duration,
-                            reservation.TableNumber));
-                    return;
+                    await CallFreeTime(botClient, update, cancellationToken, freeTables);
+                    break;
                 }
                 case "SetAdditionalInfo":
                 {
                     await CallSetAdditionalInfo(botClient, update, cancellationToken);
-                    return;
+                    break;
+                }
+                case "ConformationMessage":
+                {
+                    await CallConformationMessage(botClient, update, cancellationToken, reservation, user);
+                    break;
                 }
                 case "Confirm":
                 {
-                    reservation.InProcess = false;
-                    var listOfGameTables = new List<GameTable>() { reservation.Table };
-                    UserControl.AddReservation(user, reservation);
-                    UserControl.AddReservation(user, listOfGameTables, reservation.StartTime,
-                        reservation.Duration, reservation.AdditionalInfo, reservation.TableNumber);
-                    return;
+                    UserControl.RemoveReservation(user, reservation);
+                    UserControl.AddReservation(user, new List<GameTable>(){reservation.Table}, reservation.StartTime,
+                        reservation.Duration, reservation.AdditionalInfo, reservation.Table.Number);
+                    await CallMain(botClient, update, cancellationToken, user);
+                    break;
                 }
                 case "Reservations":
                 {
@@ -438,22 +456,33 @@ public static class TelegramBotController
                     }
 
                     await CallReservations(botClient, update, cancellationToken, user);
-                    return;
+                    break;
+                }
+                case "IfNeedInfo":
+                {
+                    await CallIfNeedAdditionalInfo(botClient, update, cancellationToken);
+                    break;
+                }
+                case "CancelReservation":
+                {
+                    user = await UserControl.RemoveReservation(user, user.Reservations[int.Parse(updateData[1])]);
+                    await CallMain(botClient, update, cancellationToken, user);
+                    break;
                 }
             }
         }
 
         if (update.Type == UpdateType.Message)
         {
-            if (reservation.StartTime != TimeSpan.FromHours(-1))
+            if (update.Message.Text == "/start")
+            {
+                await CallMainWithNewMessage(botClient, update, cancellationToken, user);
+            }
+            else if (reservation.StartTime != TimeSpan.FromHours(-1))
             {
                 reservation.AdditionalInfo = update.Message.Text!;
                 UserControl.AddReservation(user, reservation);
-                await CallConformationMessage(botClient, update, cancellationToken, reservation, user);
-            }
-            else if (update.Message.Text == "/start")
-            {
-                await CallMain(botClient, update, cancellationToken, user);
+                await CallConformationWithNewMessage(botClient, update, cancellationToken, reservation, user);
             }
         }
     }
@@ -461,29 +490,37 @@ public static class TelegramBotController
     public static async Task CallMain(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken,
         User user)
     {
-        var message = GetMainMessage(user);
+        var message = await GetMainMessage(user);
         Console.WriteLine(user.Nickname);
-        await botClient.SendTextMessageAsync(chatId: GetIdFromUpdate(update), text: message.Text,
+        await botClient.EditMessageTextAsync(chatId:await GetChatIdFromUpdate(update),
+            messageId:(int)await GetMessageIdFromUpdate(update), text:message.Text,replyMarkup:message.ReplyMarkup, cancellationToken: cancellationToken,parseMode:ParseMode.Markdown);
+    }
+    public static async Task CallMainWithNewMessage(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken,
+        User user)
+    {
+        var message = await GetMainMessage(user);
+        Console.WriteLine(user.Nickname);
+        await botClient.SendTextMessageAsync(chatId: await GetChatIdFromUpdate(update), text: message.Text,parseMode:ParseMode.Markdown,
             cancellationToken: cancellationToken, replyMarkup: message.ReplyMarkup);
     }
 
     public static async Task CallPlayZone(ITelegramBotClient botClient, Update update,
         CancellationToken cancellationToken, List<PlayZone> zones)
     {
-        var message = GetZoneMessage(zones);
-        await botClient.SendTextMessageAsync(chatId: GetIdFromUpdate(update), text: message.Text,
-            cancellationToken: cancellationToken, replyMarkup: message.ReplyMarkup);
+        var message = await GetZoneMessage(zones);
+        await botClient.EditMessageTextAsync(chatId:await GetChatIdFromUpdate(update),
+            messageId:(int)await GetMessageIdFromUpdate(update), text:message.Text,replyMarkup:message.ReplyMarkup, cancellationToken: cancellationToken,parseMode:ParseMode.Markdown);
     }
 
     public static async Task CallTableNumber(ITelegramBotClient botClient, Update update,
         CancellationToken cancellationToken, int amountOfTables)
     {
-        var message = GetTableNumberMessage(amountOfTables);
-        await botClient.SendTextMessageAsync(chatId: GetIdFromUpdate(update), text: message.Text,
-            cancellationToken: cancellationToken, replyMarkup: message.ReplyMarkup);
+        var message = await GetTableNumberMessage(amountOfTables);
+        await botClient.EditMessageTextAsync(chatId:await GetChatIdFromUpdate(update),
+            messageId:(int)await GetMessageIdFromUpdate(update), text:message.Text,replyMarkup:message.ReplyMarkup, cancellationToken: cancellationToken,parseMode:ParseMode.Markdown);
     }
 
-    private static long GetIdFromUpdate(Update update)
+    private static async Task<long> GetChatIdFromUpdate(Update update)
     {
         switch (update.Type)
         {
@@ -493,60 +530,77 @@ public static class TelegramBotController
                 return update.CallbackQuery!.From.Id;
         }
     }
-
+    private static async Task<long> GetMessageIdFromUpdate(Update update)
+    {
+        switch (update.Type)
+        {
+            case UpdateType.Message:
+                return update.Message!.MessageId;
+            default:
+                return update.CallbackQuery!.Message!.MessageId;
+        }
+    }
     public static async Task CallDuration(ITelegramBotClient botClient, Update update,
         CancellationToken cancellationToken)
     {
-        var message = GetDurationMessage();
-        await botClient.SendTextMessageAsync(chatId: GetIdFromUpdate(update), text: message.Text,
-            cancellationToken: cancellationToken, replyMarkup: message.ReplyMarkup);
+        var message = await GetDurationMessage();
+        await botClient.EditMessageTextAsync(chatId:await GetChatIdFromUpdate(update),
+            messageId:(int)await GetMessageIdFromUpdate(update), text:message.Text,replyMarkup:message.ReplyMarkup,parseMode:ParseMode.Markdown);
     }
 
     public static async Task CallFreeTime(ITelegramBotClient botClient, Update update,
         CancellationToken cancellationToken, List<GameTable> tables)
     {
-        var message = GetFreeTimeMessage(tables);
-        await botClient.SendTextMessageAsync(chatId: GetIdFromUpdate(update), text: message.Text,
-            cancellationToken: cancellationToken, replyMarkup: message.ReplyMarkup);
+        var message = await GetFreeTimeMessage(tables);
+        await botClient.EditMessageTextAsync(chatId:await GetChatIdFromUpdate(update),
+            messageId:(int)await GetMessageIdFromUpdate(update), text:message.Text,replyMarkup:message.ReplyMarkup,parseMode:ParseMode.Markdown);
     }
 
     public static async Task CallIfNeedAdditionalInfo(ITelegramBotClient botClient, Update update,
         CancellationToken cancellationToken)
     {
-        var message = GetIfNeedAdditionalInfoMessage();
-        await botClient.SendTextMessageAsync(chatId: GetIdFromUpdate(update), text: message.Text,
-            cancellationToken: cancellationToken, replyMarkup: message.ReplyMarkup);
+        var message = await GetIfNeedAdditionalInfoMessage();
+        await botClient.EditMessageTextAsync(chatId:await GetChatIdFromUpdate(update),
+            messageId:(int)await GetMessageIdFromUpdate(update), text:message.Text,replyMarkup:message.ReplyMarkup, cancellationToken: cancellationToken,parseMode:ParseMode.Markdown);
     }
 
     public static async Task CallSetAdditionalInfo(ITelegramBotClient botClient, Update update,
         CancellationToken cancellationToken)
     {
-        var message = GetSetAdditionalInfoMessage();
-        await botClient.SendTextMessageAsync(chatId: GetIdFromUpdate(update), text: message.Text,
-            cancellationToken: cancellationToken, replyMarkup: message.ReplyMarkup);
+        var message = await GetSetAdditionalInfoMessage();
+        await botClient.EditMessageTextAsync(chatId:await GetChatIdFromUpdate(update),
+            messageId:(int)await GetMessageIdFromUpdate(update), text:message.Text,replyMarkup:message.ReplyMarkup, cancellationToken: cancellationToken,parseMode:ParseMode.Markdown);
     }
 
     public static async Task CallConformationMessage(ITelegramBotClient botClient, Update update,
         CancellationToken cancellationToken, Reservation reservation, User user)
     {
-        var message = GetConformationMessage(reservation, user);
-        await botClient.SendTextMessageAsync(chatId: GetIdFromUpdate(update), text: message.Text,
-            cancellationToken: cancellationToken, replyMarkup: message.ReplyMarkup);
+        var message =await GetConformationMessage(reservation, user);
+        await botClient.EditMessageTextAsync(chatId:await GetChatIdFromUpdate(update),
+            messageId:(int)await GetMessageIdFromUpdate(update), text:message.Text,replyMarkup:message.ReplyMarkup, cancellationToken: cancellationToken,parseMode:ParseMode.Markdown);
+    }
+    public static async Task CallConformationWithNewMessage(ITelegramBotClient botClient, Update update,
+        CancellationToken cancellationToken, Reservation reservation, User user)
+    {
+        var message =await GetConformationMessage(reservation, user);
+        await botClient.SendTextMessageAsync(chatId:await GetChatIdFromUpdate(update), text: message.Text,
+            cancellationToken: cancellationToken, replyMarkup: message.ReplyMarkup,parseMode:ParseMode.Markdown);
     }
 
     public static async Task CallReservations(ITelegramBotClient botClient, Update update,
         CancellationToken cancellationToken, User user)
     {
-        var message = GetAllReservationsMessage(user);
-        await botClient.SendTextMessageAsync(chatId: GetIdFromUpdate(update), text: message.Text,
-            cancellationToken: cancellationToken, replyMarkup: message.ReplyMarkup);
+        user.Reservations.RemoveAll((reservation1) => reservation1.InProcess);
+        var message = await GetAllReservationsMessage(user);
+        await botClient.EditMessageTextAsync(chatId:await GetChatIdFromUpdate(update),
+            messageId:(int)await GetMessageIdFromUpdate(update), text:message.Text,replyMarkup:message.ReplyMarkup, cancellationToken: cancellationToken,parseMode:ParseMode.Markdown);
     }
 
     public static async Task CallReservationInfo(ITelegramBotClient botClient, Update update,
         CancellationToken cancellationToken, Reservation reservation, User user)
     {
-        var message = GetReservationInfoMessage(reservation, user);
-        await botClient.SendTextMessageAsync(chatId: GetIdFromUpdate(update), text: message.Text,
-            cancellationToken: cancellationToken, replyMarkup: message.ReplyMarkup);
+        var message = await GetReservationInfoMessage(reservation, user);
+        await botClient.EditMessageTextAsync(chatId:await GetChatIdFromUpdate(update),
+            messageId:(int)await GetMessageIdFromUpdate(update), text:message.Text,replyMarkup:message.ReplyMarkup, cancellationToken: cancellationToken,parseMode:ParseMode.Markdown);
     }
 }
