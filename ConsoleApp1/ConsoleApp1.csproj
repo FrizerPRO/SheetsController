@@ -8,15 +8,16 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\GoogleSheetsTimeTable\GoogleSheetsTimeTable.csproj"/>
+        <ProjectReference Include="..\GoogleSheetsTimeTable\GoogleSheetsTimeTable.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Telegram.Bot" Version="18.0.0"/>
+        <PackageReference Include="Telegram.Bot" Version="18.0.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="SerializedUsers"/>
+        <Folder Include="NugetPacages" />
+        <Folder Include="SerializedUsers" />
     </ItemGroup>
 
 </Project>
