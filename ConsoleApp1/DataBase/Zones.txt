@@ -1,0 +1,2 @@
+Comfort:9
+Premium:5
