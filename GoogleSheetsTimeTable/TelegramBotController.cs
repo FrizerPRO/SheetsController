@@ -1,6 +1,7 @@
 using SheetsController;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
+using Telegram.Bot.Requests;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -427,6 +428,13 @@ namespace SheetsController
                         }
                     case "Confirm":
                         {
+                            if (reservation.Duration <= TimeSpan.Zero || reservation.StartTime <= TimeSpan.Zero)
+                            {
+                                Console.WriteLine(reservation.Duration);
+                                Console.WriteLine(reservation.StartTime);
+                                await CallPlayZone(botClient, update, cancellationToken, DataBase.Zones);
+                                return;
+                            }
                             await UserControl.RemoveReservation(user, reservation);
                             await UserControl.AddReservation(user, new List<GameTable> { reservation.Table }, reservation.StartTime,
                                 reservation.Duration, reservation.AdditionalInfo, reservation.Table.Number);
@@ -465,12 +473,20 @@ namespace SheetsController
                 {
                     await CallMainWithNewMessage(botClient, update, cancellationToken, user);
                 }
-                else if (reservation.StartTime != TimeSpan.FromHours(-1))
+                else if (reservation.StartTime != TimeSpan.FromHours(-1) && reservation.InProcess)
                 {
                     reservation.AdditionalInfo = update.Message.Text!;
                     await UserControl.AddReservation(user, reservation);
                     await CallConformationWithNewMessage(botClient, update, cancellationToken, reservation, user);
                 }
+                else
+                {
+                    await botClient.DeleteMessageAsync(update.Message.Chat.Id, update.Message.MessageId,
+                        cancellationToken: cancellationToken);   
+                }
+
+                
+                //messageToDelete
             }
         }
 
@@ -490,6 +506,7 @@ namespace SheetsController
         {
             var message = await GetMainMessage(user);
             Console.WriteLine(user.Nickname);
+            await DeletePreviousContent(botClient, update, cancellationToken);
             await botClient.SendTextMessageAsync(await GetChatIdFromUpdate(update), message.Text, ParseMode.Markdown,
                 cancellationToken: cancellationToken, replyMarkup: message.ReplyMarkup);
         }
@@ -579,12 +596,26 @@ namespace SheetsController
                 cancellationToken: cancellationToken, parseMode: ParseMode.Markdown);
         }
 
+        
         public static async Task CallConformationWithNewMessage(ITelegramBotClient botClient, Update update,
             CancellationToken cancellationToken, Reservation reservation, User user)
         {
             var message = await GetConformationMessage(reservation, user);
+            await DeletePreviousContent(botClient, update, cancellationToken);
             await botClient.SendTextMessageAsync(await GetChatIdFromUpdate(update), message.Text,
                 cancellationToken: cancellationToken, replyMarkup: message.ReplyMarkup, parseMode: ParseMode.Markdown);
+        }
+
+        private static async Task DeletePreviousContent(ITelegramBotClient botClient, Update update,
+            CancellationToken cancellationToken)
+        {
+            if(update.Type == UpdateType.CallbackQuery)
+            await botClient.DeleteMessageAsync(update.CallbackQuery.From.Id, update.CallbackQuery.Message.MessageId,
+                cancellationToken: cancellationToken);
+            else
+            {
+                await botClient.DeleteMessageAsync(update.Message.Chat.Id,update.Message.MessageId, cancellationToken: cancellationToken);
+            }
         }
 
         public static async Task CallReservations(ITelegramBotClient botClient, Update update,
