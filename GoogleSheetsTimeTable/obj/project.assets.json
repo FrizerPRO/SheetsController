@@ -233,24 +233,26 @@
     ]
   },
   "packageFolders": {
-    "/Users/Frizer/.nuget/packages/": {}
+    "C:\\Users\\loxam\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/Frizer/RiderProjects/SheetsController/GoogleSheetsTimeTable/GoogleSheetsTimeTable.csproj",
+      "projectUniqueName": "C:\\Users\\loxam\\RiderProjects\\SheetsController\\GoogleSheetsTimeTable\\GoogleSheetsTimeTable.csproj",
       "projectName": "GoogleSheetsTimeTable",
-      "projectPath": "/Users/Frizer/RiderProjects/SheetsController/GoogleSheetsTimeTable/GoogleSheetsTimeTable.csproj",
-      "packagesPath": "/Users/Frizer/.nuget/packages/",
-      "outputPath": "/Users/Frizer/RiderProjects/SheetsController/GoogleSheetsTimeTable/obj/",
+      "projectPath": "C:\\Users\\loxam\\RiderProjects\\SheetsController\\GoogleSheetsTimeTable\\GoogleSheetsTimeTable.csproj",
+      "packagesPath": "C:\\Users\\loxam\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\loxam\\RiderProjects\\SheetsController\\GoogleSheetsTimeTable\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/Users/Frizer/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\loxam\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net6.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -284,7 +286,8 @@
           "net47",
           "net471",
           "net472",
-          "net48"
+          "net48",
+          "net481"
         ],
         "assetTargetFallback": true,
         "warn": true,
@@ -293,7 +296,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/6.0.202/RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.400\\RuntimeIdentifierGraph.json"
       }
     }
   }
