@@ -27,7 +27,8 @@ namespace SheetsController
             Service = new SheetsService(new BaseClientService.Initializer
             {
                 HttpClientInitializer = GetCredential().Result,
-                ApplicationName = ApplicationName
+                ApplicationName = ApplicationName,
+                ApiKey = "AIzaSyCf_S465zxa_BpZ2e6KVgA-zx1LF9OHpr8"
             });
         }
 
@@ -100,17 +101,14 @@ namespace SheetsController
             return result;
         }
 
-        private static async Task<UserCredential> GetCredential()
+        private static async Task<ServiceAccountCredential> GetCredential()
         {
             using var stream =
-                new FileStream("../../../../ConsoleApp1/Credential/credentials.json", FileMode.Open, FileAccess.Read);
+                new FileStream(Directory.GetParent(System.Reflection.Assembly.GetEntryAssembly().Location) +"/Credential/service_account.json", FileMode.Open, FileAccess.Read);
             /* The file token.json stores the user's access and refresh tokens, and is created
                  automatically when the authorization flow completes for the first time. */
-            return GoogleWebAuthorizationBroker.AuthorizeAsync(
-                GoogleClientSecrets.FromStreamAsync(stream).Result.Secrets,
-                Scopes,
-                "user",
-                CancellationToken.None).Result;
+            return  ServiceAccountCredential.FromServiceAccountData(stream);
+
         }
 
         public static async Task<GameTable?> GetFreeTable(List<GameTable> tables, TimeSpan userTime)

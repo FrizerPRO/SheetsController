@@ -2,7 +2,7 @@ namespace SheetsController
 {
     public static class DataBase
     {
-        private const string PathBegin = "../../../../ConsoleApp1/DataBase/";
+        private static readonly string PathBegin = Directory.GetParent(System.Reflection.Assembly.GetEntryAssembly().Location) +"/DataBase/";
 
         public static List<PlayZone> Zones
         {

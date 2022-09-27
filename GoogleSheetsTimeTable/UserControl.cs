@@ -6,7 +6,7 @@ namespace SheetsController
     [Serializable]
     public static class UserControl
     {
-        private static readonly string Folder = "../../../../ConsoleApp1/SerializedUsers/";
+        private static readonly string Folder = Directory.GetParent(System.Reflection.Assembly.GetEntryAssembly().Location) + "/SerializedUsers/";
 
         public static async Task SerializeUser(User user)
         {

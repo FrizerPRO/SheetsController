@@ -11,7 +11,7 @@ namespace SheetsController
 {
     public static class TelegramBotController
     {
-        private static readonly string FolderWithText = "../../../../ConsoleApp1/TextForMessages/";
+        private static readonly string FolderWithText = Directory.GetParent(System.Reflection.Assembly.GetEntryAssembly().Location) + "/TextForMessages/";
 
         public static async Task<InlineKeyboardMarkup> GetMainTab(User user)
         {
