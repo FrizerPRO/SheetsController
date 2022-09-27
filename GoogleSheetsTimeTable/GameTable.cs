@@ -1,54 +1,56 @@
-namespace SheetsController;
-
-[Serializable]
-public class GameTable
+namespace SheetsController
 {
-    public GameTable()
+
+    [Serializable]
+    public class GameTable
     {
-        TimeTableString = new Dictionary<string, string>();
-        FreeTime = new List<TimeSpan>();
-        Zone = new PlayZone();
-    }
-
-    public GameTable(PlayZone zone, int number)
-    {
-        Zone = zone;
-        Number = number;
-        FreeTime = new List<TimeSpan>();
-        TimeTableString = new Dictionary<string, string>();
-    }
-
-    public List<TimeSpan> FreeTime { get; set; }
-
-    public int Number { get; set; }
-
-    public Dictionary<string, string> TimeTableString { get; set; }
-
-    public PlayZone Zone { get; set; }
-
-    public string Range
-    {
-        get
+        public GameTable()
         {
-            var range = Zone.Name + "!";
-            range +=
-                $"{SheetsController.GetColumnName(Number)}2:" +
-                $"{SheetsController.GetColumnName(Number)}" +
-                $"{SheetsController.TotalRows}";
-            return range;
+            TimeTableString = new Dictionary<string, string>();
+            FreeTime = new List<TimeSpan>();
+            Zone = new PlayZone();
         }
-    }
 
-    public Dictionary<TimeSpan, string> GetTimeTable()
-    {
-        Dictionary<TimeSpan, string> result = new();
-        foreach (var i in TimeTableString) result[TimeSpan.Parse(i.Key)] = i.Value;
+        public GameTable(PlayZone zone, int number)
+        {
+            Zone = zone;
+            Number = number;
+            FreeTime = new List<TimeSpan>();
+            TimeTableString = new Dictionary<string, string>();
+        }
 
-        return result;
-    }
+        public List<TimeSpan> FreeTime { get; set; }
 
-    public void SetTimeTable(Dictionary<TimeSpan, string> value)
-    {
-        foreach (var i in value) TimeTableString[i.Key.ToString()] = i.Value;
+        public int Number { get; set; }
+
+        public Dictionary<string, string> TimeTableString { get; set; }
+
+        public PlayZone Zone { get; set; }
+
+        public string Range
+        {
+            get
+            {
+                var range = Zone.Name + "!";
+                range +=
+                    $"{SheetsController.GetColumnName(Number)}2:" +
+                    $"{SheetsController.GetColumnName(Number)}" +
+                    $"{SheetsController.TotalRows}";
+                return range;
+            }
+        }
+
+        public Dictionary<TimeSpan, string> GetTimeTable()
+        {
+            Dictionary<TimeSpan, string> result = new();
+            foreach (var i in TimeTableString) result[TimeSpan.Parse(i.Key)] = i.Value;
+
+            return result;
+        }
+
+        public void SetTimeTable(Dictionary<TimeSpan, string> value)
+        {
+            foreach (var i in value) TimeTableString[i.Key.ToString()] = i.Value;
+        }
     }
 }
