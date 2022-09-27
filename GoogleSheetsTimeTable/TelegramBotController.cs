@@ -75,13 +75,13 @@ namespace SheetsController
         public static async Task<InlineKeyboardMarkup> GetDurationTab()
         {
             List<IList<InlineKeyboardButton>> result = new();
-            for (var i = SheetsController.SheetsController.MinimumStep;
-                 i <= SheetsController.SheetsController.MaxReservationDuration;)
+            for (var i = SheetsController.MinimumStep;
+                 i <= SheetsController.MaxReservationDuration;)
             {
                 List<InlineKeyboardButton> tableNumbers = new();
                 for (var j = 0;
-                     j < 3 && i <= SheetsController.SheetsController.MaxReservationDuration;
-                     j++, i += SheetsController.SheetsController.MinimumStep)
+                     j < 3 && i <= SheetsController.MaxReservationDuration;
+                     j++, i += SheetsController.MinimumStep)
                     tableNumbers.Add(InlineKeyboardButton.WithCallbackData(i.ToString(),
                         $"Duration {i.ToString()}"));
 
@@ -98,7 +98,7 @@ namespace SheetsController
         public static async Task<InlineKeyboardMarkup> GetFreeTimeTab(List<GameTable> gameTables)
         {
             List<IList<InlineKeyboardButton>> result = new();
-            var allFreeTime = await SheetsController.SheetsController.GetAllFreeTimeSpans(gameTables);
+            var allFreeTime = await SheetsController.GetAllFreeTimeSpans(gameTables);
             for (var i = 0; i < allFreeTime.Count;)
             {
                 List<InlineKeyboardButton> tableNumbers = new();
@@ -379,7 +379,7 @@ namespace SheetsController
                             if (updateData.Length > 1)
                             {
                                 reservation.Duration = TimeSpan.Parse(updateData[1]);
-                                var tables = SheetsController.SheetsController.GetFreeTables(reservation.Zone,
+                                var tables = SheetsController.GetFreeTables(reservation.Zone,
                                     reservation.Duration,
                                     reservation.Table.Number);
                                 await UserControl.AddReservation(user, reservation);
@@ -392,14 +392,14 @@ namespace SheetsController
                         }
                     case "FreeTime":
                         {
-                            var freeTables = SheetsController.SheetsController.GetFreeTables(reservation.Zone,
+                            var freeTables = SheetsController.GetFreeTables(reservation.Zone,
                                 reservation.Duration,
                                 reservation.Table.Number);
                             if (updateData.Length > 1)
                             {
                                 reservation.StartTime = TimeSpan.Parse(updateData[1]);
                                 var table =
-                                    SheetsController.SheetsController.GetFreeTable(await freeTables, reservation.StartTime);
+                                    SheetsController.GetFreeTable(await freeTables, reservation.StartTime);
                                 if (table == null)
                                 {
                                     await CallFreeTime(botClient, update, cancellationToken, await freeTables);
