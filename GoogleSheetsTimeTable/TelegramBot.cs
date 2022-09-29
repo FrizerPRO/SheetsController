@@ -12,17 +12,23 @@ namespace SheetsController
             CancellationTokenSource = cancellationToken;
             BotClient = new TelegramBotClient(token);
         }
-
+        public DateTime midnight = DateTime.Today + TimeSpan.FromHours(12) - SheetsController.UTCAdjustment;
         public TelegramBotClient BotClient { get; }
 
         public CancellationTokenSource CancellationTokenSource { get; }
 
-        public void Run()
+         public void Run()
         {
-            var receiverOptions = new ReceiverOptions
-            {
-                AllowedUpdates = new[] { UpdateType.Message, UpdateType.CallbackQuery }
-            };
+            AlarmClock clock = new AlarmClock(midnight);
+            clock.Alarm += async (sender, e)=> {
+                foreach (var zone in DataBase.Zones)
+                {
+                    await zone.RefreshInMidnight();
+                }
+            }
+            ;
+            var receiverOptions = new ReceiverOptions();
+            receiverOptions.AllowedUpdates = new[] { UpdateType.Message, UpdateType.CallbackQuery };
             BotClient.StartReceiving(
                 TelegramBotController.HandleUpdateAsync,
                 TelegramBotController.HandlePollingErrorAsync,

@@ -2,7 +2,6 @@
 
 namespace SheetsController
 {
-
     public class PlayZone
     {
         private readonly Sheet _sheet;
@@ -32,42 +31,41 @@ namespace SheetsController
                 $"{SheetsController.TotalRows}";
             var valuesToUpdate = await SheetsController.GetValuesFromRange(range, DataBase.SpreadSheetId)
                                  ?? new List<IList<object>>();
-            var requests = new List<Request>();
-            await Refresh();
+            await Refresh(); 
+            UserControl.DeleteAllUsersJson();
             var turnedValues = TurnValues(valuesToUpdate, Capacity, rowToRenewFrom);
 
             for (var i = 0; i < Capacity; i++)
-                for (var j = 0; j < rowToRenewFrom; j++)
+            for (var j = 0; j < rowToRenewFrom; j++)
+            {
+                var duration = 0;
+                while (j < rowToRenewFrom && turnedValues[i][j].ToString() != string.Empty &&( duration == 0||
+                           turnedValues[i][j - 1].ToString() == turnedValues[i][j].ToString()))
                 {
-                    var duration = 0;
-                    while (j < rowToRenewFrom && turnedValues[i][j].ToString() != string.Empty)
-                    {
-                        duration++;
-                        j++;
-                    }
-
-                    if (duration <= 0) continue;
-
-                    var startTime = SheetsController.TimeToRowNumber.FirstOrDefault(
-                        item => item.Value == j - duration + 2).Key;
-                    var durationInTime = SheetsController.TimeToRowNumber.FirstOrDefault(
-                        item => item.Value == duration + 2).Key;
-                    Console.WriteLine();
-                    var values = SheetsController.GetFreeTables(this, durationInTime,
-                        i + 1);
-                    var allValues = turnedValues[i][j - 1].ToString()!
-                        .Split("::->", StringSplitOptions.RemoveEmptyEntries);
-                    var nickname = allValues[0];
-                    var additionalInfo = "";
-                    if (allValues.Length > 1)
-                        additionalInfo = allValues[1];
-                    await UserControl.AddReservation(new User(nickname), await values, startTime,
-                        durationInTime, additionalInfo, i + 1);
+                    duration++;
+                    j++;
                 }
 
-            await SheetsController.FillCells(requests, DataBase.SpreadSheetId);
-        }
+                if (duration <= 0) continue;
+                var allValues = turnedValues[i][j - 1].ToString()!
+                    .Split("::->", StringSplitOptions.RemoveEmptyEntries);
+                var nickname = allValues[0];
+                var startTime = SheetsController.TimeToRowNumber.FirstOrDefault(
+                    item => item.Value == j - duration + 2).Key;
+                var durationInTime = SheetsController.TimeToRowNumber.FirstOrDefault(
+                    item => item.Value == duration + 2).Key;
+                var values = SheetsController.GetFreeTables(this, durationInTime,
+                    i + 1);
 
+                var additionalInfo = "";
+                if (allValues.Length > 1)
+                    additionalInfo = allValues[1];
+                bool t = await UserControl.AddReservation(new User(nickname), await values, startTime,
+                    durationInTime, additionalInfo, i + 1);
+                Console.WriteLine(nickname);
+                j--;
+            }
+        }
 
         private IList<IList<object>> TurnValues(IList<IList<object>> valuesToUpdate, int capacity, int rowToRenewFrom)
         {
@@ -80,14 +78,14 @@ namespace SheetsController
             }
 
             for (var i = 0; i < rowToRenewFrom; i++)
-                for (var j = 0; j < Capacity; j++)
-                    if (valuesToUpdate.Count > i &&
-                        valuesToUpdate[i].Count > j &&
-                        valuesToUpdate[i][j].ToString() != string.Empty)
-                    {
-                        res[j][i] = valuesToUpdate[i][j];
-                        Console.WriteLine(valuesToUpdate[i][j] + " i: " + i + " j: " + j);
-                    }
+            for (var j = 0; j < Capacity; j++)
+                if (valuesToUpdate.Count > i &&
+                    valuesToUpdate[i].Count > j &&
+                    valuesToUpdate[i][j].ToString() != string.Empty)
+                {
+                    res[j][i] = valuesToUpdate[i][j];
+                    Console.WriteLine(valuesToUpdate[i][j] + " i: " + i + " j: " + j);
+                }
 
             return res;
         }
@@ -96,13 +94,14 @@ namespace SheetsController
         {
             var requests = new List<Request>();
             for (var i = 1; i <= Capacity + 1; i++)
-                for (var j = 1; j <= SheetsController.TotalRows; j++)
-                {
-                    var range = SheetsController.GetRangeForSingleCell(i, j, _sheet);
-                    var text = GetCellTextForRefreshing(i - 1, j);
-                    var cell = SheetsController.CreateCell(text, new CellFormat());
-                    requests.Add(await SheetsController.GetRequestToFill(range.Result, cell.Result));
-                }
+            for (var j = 1; j <= SheetsController.TotalRows; j++)
+            {
+                var range = SheetsController.GetRangeForSingleCell(i, j, _sheet);
+                var text = GetCellTextForRefreshing(i - 1, j);
+                var cell = SheetsController.CreateCell(text, new CellFormat());
+                requests.Add(await SheetsController.GetRequestToFill(range.Result, cell.Result));
+            }
+
             await SheetsController.FillCells(requests, DataBase.SpreadSheetId);
         }
 

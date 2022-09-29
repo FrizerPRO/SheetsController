@@ -5,11 +5,11 @@ using Google.Apis.Sheets.v4.Data;
 
 namespace SheetsController
 {
-
-
     [Serializable]
     public static class SheetsController
     {
+        public static readonly TimeSpan UTCAdjustment = TimeSpan.FromHours(3);
+
         public static readonly TimeSpan MinimumStep = TimeSpan.FromMinutes(30);
 
         private static readonly TimeSpan TotalDuration = TimeSpan.FromDays(2) - MinimumStep;
@@ -59,7 +59,8 @@ namespace SheetsController
             }
         }
 
-        public static async Task<Reservation?> TrySetFreeTime(List<GameTable> values, TimeSpan startTime, string nickname,
+        public static async Task<Reservation?> TrySetFreeTime(List<GameTable> values, TimeSpan startTime,
+            string nickname,
             TimeSpan duration, PlayZone zone, string additionalInfo, int tableNumber = -1)
         {
             var valuesToCompare = await GetFreeTables(zone, duration, tableNumber);
@@ -71,7 +72,7 @@ namespace SheetsController
         public static async Task<List<GameTable>> GetFreeTables(PlayZone zone, TimeSpan duration, int tableNumber = -1)
         {
             var values = await GetTable(await GetRange(zone, tableNumber));
-            values = await ChangeTimeForFree(values, duration);
+            values = await ChangeTimeForFree(values, duration, zone);
             await CheckForTimeCapableToNow(values);
             return values;
         }
@@ -83,7 +84,8 @@ namespace SheetsController
                 var resTable = new List<TimeSpan>();
                 table.FreeTime.ForEach(time =>
                 {
-                    if (time >= DateTime.Now - DateTime.Now.Date)
+                    if (time >= DateTime.Now + SheetsController.UTCAdjustment - DateTime.Now.Date &&
+                        time < DateTime.Now.AddDays(1) + SheetsController.UTCAdjustment - DateTime.Now.Date)
                         resTable.Add(time);
                 });
                 table.FreeTime = resTable;
@@ -94,9 +96,9 @@ namespace SheetsController
         {
             List<TimeSpan> result = new();
             foreach (var table in gameTables)
-                foreach (var freeTime in table.FreeTime)
-                    if (!result.Contains(freeTime))
-                        result.Add(freeTime);
+            foreach (var freeTime in table.FreeTime)
+                if (!result.Contains(freeTime))
+                    result.Add(freeTime);
             result.Sort();
             return result;
         }
@@ -104,11 +106,12 @@ namespace SheetsController
         private static async Task<ServiceAccountCredential> GetCredential()
         {
             using var stream =
-                new FileStream(Directory.GetParent(System.Reflection.Assembly.GetEntryAssembly().Location) +"/Credential/service_account.json", FileMode.Open, FileAccess.Read);
+                new FileStream(
+                    Directory.GetParent(System.Reflection.Assembly.GetEntryAssembly().Location) +
+                    "/Credential/service_account.json", FileMode.Open, FileAccess.Read);
             /* The file token.json stores the user's access and refresh tokens, and is created
                  automatically when the authorization flow completes for the first time. */
-            return  ServiceAccountCredential.FromServiceAccountData(stream);
-
+            return ServiceAccountCredential.FromServiceAccountData(stream);
         }
 
         public static async Task<GameTable?> GetFreeTable(List<GameTable> tables, TimeSpan userTime)
@@ -126,25 +129,26 @@ namespace SheetsController
             if (resultTable == null)
                 return null;
             var range = await GetRangeForFillingTables(resultTable, userTime, duration);
-            var cell = await CreateCell(additionalInfo == "" ? nickname : nickname + "::->" + additionalInfo, new CellFormat
-            {
-                BackgroundColor = new Color
+            var cell = await CreateCell(additionalInfo == "" ? nickname : nickname + "::->" + additionalInfo,
+                new CellFormat
                 {
-                    Red = 1,
-                    Blue = 0,
-                    Green = 0,
-                    Alpha = 1
-                },
-                TextFormat = new TextFormat
-                {
-                    Bold = true
-                }
-            });
+                    BackgroundColor = new Color
+                    {
+                        Red = 1,
+                        Blue = 0,
+                        Green = 0,
+                        Alpha = 1
+                    },
+                    TextFormat = new TextFormat
+                    {
+                        Bold = true
+                    }
+                });
             Console.WriteLine(cell.ToString());
             var requests = new List<Request>
-        {
-            await GetRequestToFill(range, cell)
-        };
+            {
+                await GetRequestToFill(range, cell)
+            };
             await FillCells(requests, DataBase.SpreadSheetId);
             return new Reservation(resultTable, userTime, duration, additionalInfo)
             {
@@ -194,7 +198,8 @@ namespace SheetsController
             return cell;
         }
 
-        internal static async Task<GridRange> GetRangeForFillingTables(GameTable table, TimeSpan startTime, TimeSpan duration)
+        internal static async Task<GridRange> GetRangeForFillingTables(GameTable table, TimeSpan startTime,
+            TimeSpan duration)
         {
             var spr = Service.Spreadsheets.Get(DataBase.SpreadSheetId).Execute();
             var sh = spr.Sheets.FirstOrDefault(s => s.Properties.Title ==
@@ -241,8 +246,17 @@ namespace SheetsController
             return tables;
         }
 
-        private static async Task<List<GameTable>> ChangeTimeForFree(List<GameTable> tables, TimeSpan duration)
+        private static async Task<List<GameTable>> ChangeTimeForFree(List<GameTable> tables, TimeSpan duration,
+            PlayZone zone)
         {
+            // if (tables.Count == 0)
+            // {
+            //     tables = new List<GameTable>(zone.Capacity);
+            //     for (var i = 0; i < tables.Count; i++)
+            //     {
+            //         tables[i] = new GameTable(zone, i);
+            //     }
+            // }
             foreach (var table in tables)
             {
                 var tableArray = table.GetTimeTable().ToArray();
@@ -276,7 +290,8 @@ namespace SheetsController
             return tables;
         }
 
-        private static async Task<List<TimeSpan>> GetAllFreeCells(TimeSpan maxDuration, TimeSpan duration, TimeSpan endTime)
+        private static async Task<List<TimeSpan>> GetAllFreeCells(TimeSpan maxDuration, TimeSpan duration,
+            TimeSpan endTime)
         {
             var localTime = endTime - duration;
             List<TimeSpan> result = new();
