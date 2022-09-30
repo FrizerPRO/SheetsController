@@ -1,11 +1,15 @@
 ﻿using System.Timers;
-using Telegram.Bot.Types;
-using Timer = System.Threading.Timer;
+using Timer = System.Timers.Timer;
 
 namespace SheetsController;
-using System.Timers;
+
 public class AlarmClock
 {
+    private EventHandler alarmEvent;
+    private readonly DateTime alarmTime;
+    private bool enabled;
+    private readonly Timer timer;
+
     public AlarmClock(DateTime alarmTime)
     {
         this.alarmTime = alarmTime;
@@ -18,9 +22,9 @@ public class AlarmClock
         enabled = true;
     }
 
-    void  timer_Elapsed(object sender, ElapsedEventArgs e)
+    private void timer_Elapsed(object sender, ElapsedEventArgs e)
     {
-        if(enabled && DateTime.Now > alarmTime)
+        if (enabled && SheetsController.Now > alarmTime)
         {
             enabled = false;
             OnAlarm();
@@ -30,19 +34,14 @@ public class AlarmClock
 
     protected virtual void OnAlarm()
     {
-        if(alarmEvent != null)
+        if (alarmEvent != null)
             alarmEvent(this, EventArgs.Empty);
     }
 
 
     public event EventHandler Alarm
     {
-        add { alarmEvent += value; }
-        remove { alarmEvent -= value; }
+        add => alarmEvent += value;
+        remove => alarmEvent -= value;
     }
-
-    private EventHandler alarmEvent;
-    private Timer timer;
-    private DateTime alarmTime;
-    private bool enabled;
 }
