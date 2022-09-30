@@ -337,6 +337,7 @@ public static class TelegramBotController
         }
 
         var user = new User(nickname);
+
         var reservation = user.Reservations.Find(reservation1 => reservation1.InProcess);
         if (reservation == null)
             reservation = new Reservation(new GameTable(), TimeSpan.FromHours(-1), TimeSpan.FromHours(-1), "");
@@ -407,7 +408,7 @@ public static class TelegramBotController
                         }
 
                         reservation.Table = await table;
-                        UserControl.AddReservation(user, reservation);
+                        await UserControl.AddReservation(user, reservation);
                         await CallIfNeedAdditionalInfo(botClient, update, cancellationToken);
                         return;
                     }
@@ -417,7 +418,9 @@ public static class TelegramBotController
                 }
                 case "SetAdditionalInfo":
                 {
-                    await CallSetAdditionalInfo(botClient, update, cancellationToken);
+                    var message = await CallSetAdditionalInfo(botClient, update, cancellationToken);
+                    reservation.MessageIdToDelete = message.MessageId;
+                    await UserControl.AddReservation(user, reservation);
                     break;
                 }
                 case "ConformationMessage":
@@ -476,6 +479,10 @@ public static class TelegramBotController
             }
             else if (reservation.StartTime != TimeSpan.FromHours(-1) && reservation.InProcess)
             {
+                if (reservation.MessageIdToDelete != -1)
+                    await botClient.DeleteMessageAsync(update.Message.Chat.Id,
+                        reservation.MessageIdToDelete, cancellationToken);
+
                 reservation.AdditionalInfo = update.Message.Text!;
                 await UserControl.AddReservation(user, reservation);
                 await CallConformationWithNewMessage(botClient, update, cancellationToken, reservation, user);
@@ -485,9 +492,6 @@ public static class TelegramBotController
                 await botClient.DeleteMessageAsync(update.Message.Chat.Id, update.Message.MessageId,
                     cancellationToken);
             }
-
-
-            //messageToDelete
         }
     }
 
@@ -579,11 +583,11 @@ public static class TelegramBotController
             cancellationToken: cancellationToken, parseMode: ParseMode.Markdown);
     }
 
-    public static async Task CallSetAdditionalInfo(ITelegramBotClient botClient, Update update,
+    public static async Task<Message> CallSetAdditionalInfo(ITelegramBotClient botClient, Update update,
         CancellationToken cancellationToken)
     {
         var message = await GetSetAdditionalInfoMessage();
-        await botClient.EditMessageTextAsync(await GetChatIdFromUpdate(update),
+        return await botClient.EditMessageTextAsync(await GetChatIdFromUpdate(update),
             (int)await GetMessageIdFromUpdate(update), message.Text, replyMarkup: message.ReplyMarkup,
             cancellationToken: cancellationToken, parseMode: ParseMode.Markdown);
     }

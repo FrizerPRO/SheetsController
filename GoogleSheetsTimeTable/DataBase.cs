@@ -22,7 +22,7 @@ public static class DataBase
                 int.TryParse(capacityStr, out capacity);
                 result.Add(new PlayZone(name, capacity));
             }
-    
+
             return result;
         }
     }

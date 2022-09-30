@@ -3,7 +3,8 @@ namespace SheetsController;
 [Serializable]
 public class Reservation
 {
-    public Reservation(GameTable table, TimeSpan startTime, TimeSpan duration, string additionalInfo)
+    public Reservation(GameTable table, TimeSpan startTime, TimeSpan duration, string additionalInfo,
+        int messageIdToDelete = -1)
     {
         Table = table;
         StartTime = startTime;
@@ -11,7 +12,10 @@ public class Reservation
         AdditionalInfo = additionalInfo;
         InProcess = true;
         Zone = table.Zone;
+        MessageIdToDelete = messageIdToDelete;
     }
+
+    public int MessageIdToDelete { get; set; }
 
     public bool InProcess { get; set; }
 

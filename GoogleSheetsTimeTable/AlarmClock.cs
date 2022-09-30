@@ -5,10 +5,10 @@ namespace SheetsController;
 
 public class AlarmClock
 {
-    private EventHandler alarmEvent;
     private readonly DateTime alarmTime;
-    private bool enabled;
     private readonly Timer timer;
+    private EventHandler alarmEvent;
+    private bool enabled;
 
     public AlarmClock(DateTime alarmTime)
     {
