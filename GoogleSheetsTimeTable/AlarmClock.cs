@@ -16,19 +16,19 @@ public class AlarmClock
 
         timer = new Timer();
         timer.Elapsed += timer_Elapsed;
-        timer.Interval = 1000;
+        timer.Interval = TimeSpan.FromMinutes(1).TotalMilliseconds;
         timer.Start();
-
         enabled = true;
+        // timer.AutoReset = true;
     }
 
     private void timer_Elapsed(object sender, ElapsedEventArgs e)
     {
         if (enabled && SheetsController.Now > alarmTime)
         {
-            enabled = false;
+            timer.Interval = TimeSpan.FromDays(1).TotalMilliseconds;
             OnAlarm();
-            timer.Stop();
+            Task.WaitAll();
         }
     }
 

@@ -32,7 +32,6 @@ public class PlayZone
         var valuesToUpdate = await SheetsController.GetValuesFromRange(range, DataBase.SpreadSheetId)
                              ?? new List<IList<object>>();
         await Refresh();
-        UserControl.DeleteAllUsersJson();
         var turnedValues = TurnValues(valuesToUpdate, Capacity, rowToRenewFrom);
 
         for (var i = 0; i < Capacity; i++)

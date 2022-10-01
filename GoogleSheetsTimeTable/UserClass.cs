@@ -6,6 +6,7 @@ public class User
     {
         Nickname = nickname;
         Reservations = reservations;
+        UserControl.SerializeUser(this).Wait();
     }
 
     public User(string nickname)
@@ -14,6 +15,7 @@ public class User
         Reservations = new List<Reservation>();
         var templeUser = UserControl.DeserializeUser(this);
         Reservations = templeUser.Result.Reservations;
+        UserControl.SerializeUser(this).Wait();
     }
 
     public User()

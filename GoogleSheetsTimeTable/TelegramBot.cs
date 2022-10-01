@@ -6,7 +6,7 @@ namespace SheetsController;
 
 public class TelegramBot
 {
-    private readonly DateTime _midnight = SheetsController.Today + TimeSpan.FromHours(12);
+    private readonly DateTime _midnight = SheetsController.Today.AddDays(1).AddMinutes(-2);
 
     public TelegramBot(string token, CancellationTokenSource cancellationToken)
     {
@@ -23,6 +23,7 @@ public class TelegramBot
         var clock = new AlarmClock(_midnight);
         clock.Alarm += async (sender, e) =>
             {
+                UserControl.DeleteAllUsersJson();
                 foreach (var zone in DataBase.Zones) await zone.RefreshInMidnight();
             }
             ;
