@@ -64,19 +64,22 @@ public static class SheetsController
 
     public static async Task<Reservation?> TrySetFreeTime(List<GameTable> values, TimeSpan startTime,
         string nickname,
-        TimeSpan duration, PlayZone zone, string additionalInfo, int tableNumber = -1)
+        TimeSpan duration, PlayZone zone, string additionalInfo, int tableNumber = -1, bool checkForTimeCapable = true)
     {
-        var valuesToCompare = await GetFreeTables(zone, duration, tableNumber);
+        var valuesToCompare = await GetFreeTables(zone, duration, tableNumber,checkForTimeCapable);
         if (valuesToCompare.Find(table => table.FreeTime.Contains(startTime)) == null)
             return null;
         return await SetFreeTime(values, startTime, nickname, duration, additionalInfo);
     }
 
-    public static async Task<List<GameTable>> GetFreeTables(PlayZone zone, TimeSpan duration, int tableNumber = -1)
+    public static async Task<List<GameTable>> GetFreeTables(PlayZone zone, TimeSpan duration, int tableNumber = -1,bool checkForTimeCapable = true)
     {
         var values = await GetTable(await GetRange(zone, tableNumber));
         values = await ChangeTimeForFree(values, duration, zone);
-        await CheckForTimeCapableToNow(values);
+        if (checkForTimeCapable)
+        {
+            await CheckForTimeCapableToNow(values);
+        }
         return values;
     }
 

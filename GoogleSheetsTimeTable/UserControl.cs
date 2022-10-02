@@ -52,13 +52,13 @@ public static class UserControl
     }
 
     public static async Task<bool> AddReservation(User user, List<GameTable> tables, TimeSpan startTime,
-        TimeSpan duration, string additionalInfo, int tableNumber)
+        TimeSpan duration, string additionalInfo, int tableNumber, bool checkForTimeCapable)
     {
         user = await DeserializeUser(user);
         if (tables.Count == 0)
             return false;
         var res = await SheetsController.TrySetFreeTime(tables, startTime, user.Nickname, duration, tables[0].Zone,
-            additionalInfo, tableNumber);
+            additionalInfo, tableNumber,checkForTimeCapable);
         if (res == null)
             return false;
         user.Reservations.Add(res);

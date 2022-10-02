@@ -60,7 +60,7 @@ public class PlayZone
             if (allValues.Length > 1)
                 additionalInfo = allValues[1];
             var t = await UserControl.AddReservation(new User(nickname), await values, startTime,
-                durationInTime, additionalInfo, i + 1);
+                durationInTime, additionalInfo, i + 1,false);
             Console.WriteLine(nickname);
             j--;
         }

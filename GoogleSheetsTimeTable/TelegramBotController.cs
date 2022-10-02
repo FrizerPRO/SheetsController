@@ -441,7 +441,7 @@ public static class TelegramBotController
                     await UserControl.RemoveReservation(user, reservation);
                     await UserControl.AddReservation(user, new List<GameTable> { reservation.Table },
                         reservation.StartTime,
-                        reservation.Duration, reservation.AdditionalInfo, reservation.Table.Number);
+                        reservation.Duration, reservation.AdditionalInfo, reservation.Table.Number,true);
                     await CallMain(botClient, update, cancellationToken, user);
                     break;
                 }
