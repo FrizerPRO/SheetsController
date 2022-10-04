@@ -1,0 +1,12 @@
+C:\Users\loxam\RiderProjects\SheetsController\GoogleSheetsTimeTable\bin\Release\net6.0\GoogleSheetsTimeTable.deps.json
+C:\Users\loxam\RiderProjects\SheetsController\GoogleSheetsTimeTable\bin\Release\net6.0\GoogleSheetsTimeTable.dll
+C:\Users\loxam\RiderProjects\SheetsController\GoogleSheetsTimeTable\bin\Release\net6.0\GoogleSheetsTimeTable.pdb
+C:\Users\loxam\RiderProjects\SheetsController\GoogleSheetsTimeTable\obj\Release\net6.0\GoogleSheetsTimeTable.csproj.AssemblyReference.cache
+C:\Users\loxam\RiderProjects\SheetsController\GoogleSheetsTimeTable\obj\Release\net6.0\GoogleSheetsTimeTable.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\loxam\RiderProjects\SheetsController\GoogleSheetsTimeTable\obj\Release\net6.0\GoogleSheetsTimeTable.AssemblyInfoInputs.cache
+C:\Users\loxam\RiderProjects\SheetsController\GoogleSheetsTimeTable\obj\Release\net6.0\GoogleSheetsTimeTable.AssemblyInfo.cs
+C:\Users\loxam\RiderProjects\SheetsController\GoogleSheetsTimeTable\obj\Release\net6.0\GoogleSheetsTimeTable.csproj.CoreCompileInputs.cache
+C:\Users\loxam\RiderProjects\SheetsController\GoogleSheetsTimeTable\obj\Release\net6.0\GoogleSheetsTimeTable.dll
+C:\Users\loxam\RiderProjects\SheetsController\GoogleSheetsTimeTable\obj\Release\net6.0\refint\GoogleSheetsTimeTable.dll
+C:\Users\loxam\RiderProjects\SheetsController\GoogleSheetsTimeTable\obj\Release\net6.0\GoogleSheetsTimeTable.pdb
+C:\Users\loxam\RiderProjects\SheetsController\GoogleSheetsTimeTable\obj\Release\net6.0\ref\GoogleSheetsTimeTable.dll

@@ -1,0 +1,10 @@
+C:\Users\loxam\RiderProjects\SheetsController\publish\GoogleSheetsTimeTable.dll
+C:\Users\loxam\RiderProjects\SheetsController\publish\GoogleSheetsTimeTable.deps.json
+C:\Users\loxam\RiderProjects\SheetsController\publish\GoogleSheetsTimeTable.pdb
+C:\Users\loxam\RiderProjects\SheetsController\publish\Google.Apis.dll
+C:\Users\loxam\RiderProjects\SheetsController\publish\Google.Apis.Auth.PlatformServices.dll
+C:\Users\loxam\RiderProjects\SheetsController\publish\Google.Apis.Auth.dll
+C:\Users\loxam\RiderProjects\SheetsController\publish\Google.Apis.Core.dll
+C:\Users\loxam\RiderProjects\SheetsController\publish\Google.Apis.Sheets.v4.dll
+C:\Users\loxam\RiderProjects\SheetsController\publish\Newtonsoft.Json.dll
+C:\Users\loxam\RiderProjects\SheetsController\publish\Telegram.Bot.dll
