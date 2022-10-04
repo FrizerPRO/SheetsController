@@ -6,9 +6,9 @@ namespace SheetsController;
 public class AlarmClock
 {
     private readonly DateTime alarmTime;
+    private readonly bool enabled;
     private readonly Timer timer;
     private EventHandler alarmEvent;
-    private readonly bool enabled;
 
     public AlarmClock(DateTime alarmTime)
     {

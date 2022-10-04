@@ -488,19 +488,19 @@ public static class TelegramBotController
         if (update.Type == UpdateType.Message)
         {
             if (reservation.StartTime != TimeSpan.FromHours(-1) && reservation.InProcess)
-                         {
-                             if (reservation.MessageIdToDelete != -1)
-                                 await botClient.DeleteMessageAsync(update.Message.Chat.Id,
-                                     reservation.MessageIdToDelete, cancellationToken);
-             
-                             reservation.AdditionalInfo = update.Message.Text!;
-                             await UserControl.AddReservation(user, reservation);
-                             await CallConformationWithNewMessage(botClient, update, cancellationToken, reservation, user);
-                         }
+            {
+                if (reservation.MessageIdToDelete != -1)
+                    await botClient.DeleteMessageAsync(update.Message.Chat.Id,
+                        reservation.MessageIdToDelete, cancellationToken);
+
+                reservation.AdditionalInfo = update.Message.Text!;
+                await UserControl.AddReservation(user, reservation);
+                await CallConformationWithNewMessage(botClient, update, cancellationToken, reservation, user);
+            }
             else if (update.Message.Text == "/start")
-                             {
-                                 await CallMainWithNewMessage(botClient, update, cancellationToken, user);
-                             }
+            {
+                await CallMainWithNewMessage(botClient, update, cancellationToken, user);
+            }
             else
             {
                 await botClient.DeleteMessageAsync(update.Message.Chat.Id, update.Message.MessageId,
