@@ -306,6 +306,19 @@ public static class TelegramBotController
         return message;
     }
 
+    public static async Task HandleUpdateAsyncWithTryCatch(ITelegramBotClient botClient, Update update,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await HandleUpdateAsync(botClient, update, cancellationToken);
+        }
+        catch (ApiRequestException exception)
+        {
+            if (exception.ErrorCode != 400) Console.WriteLine(exception.Message);
+        }
+    }
+
     public static Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception,
         CancellationToken cancellationToken)
     {
@@ -337,7 +350,6 @@ public static class TelegramBotController
         }
 
         var user = new User(nickname);
-
         var reservation = user.Reservations.Find(reservation1 => reservation1.InProcess);
         if (reservation == null)
             reservation = new Reservation(new GameTable(), TimeSpan.FromHours(-1), TimeSpan.FromHours(-1), "");
@@ -381,7 +393,7 @@ public static class TelegramBotController
                     {
                         reservation.Duration = TimeSpan.Parse(updateData[1]);
                         var tables = SheetsController.GetFreeTables(reservation.Zone,
-                            reservation.Duration,
+                            reservation.Duration, true,
                             reservation.Table.Number);
                         await UserControl.AddReservation(user, reservation);
                         await CallFreeTime(botClient, update, cancellationToken, await tables);
@@ -394,7 +406,7 @@ public static class TelegramBotController
                 case "FreeTime":
                 {
                     var freeTables = SheetsController.GetFreeTables(reservation.Zone,
-                        reservation.Duration,
+                        reservation.Duration, true,
                         reservation.Table.Number);
                     if (updateData.Length > 1)
                     {
@@ -441,8 +453,10 @@ public static class TelegramBotController
                     await UserControl.RemoveReservation(user, reservation);
                     await UserControl.AddReservation(user, new List<GameTable> { reservation.Table },
                         reservation.StartTime,
-                        reservation.Duration, reservation.AdditionalInfo, reservation.Table.Number,true);
+                        reservation.Duration, reservation.AdditionalInfo, reservation.Table.Number, true);
                     await CallMain(botClient, update, cancellationToken, user);
+
+
                     break;
                 }
                 case "Reservations":
@@ -473,20 +487,20 @@ public static class TelegramBotController
 
         if (update.Type == UpdateType.Message)
         {
-            if (update.Message.Text == "/start")
-            {
-                await CallMainWithNewMessage(botClient, update, cancellationToken, user);
-            }
-            else if (reservation.StartTime != TimeSpan.FromHours(-1) && reservation.InProcess)
-            {
-                if (reservation.MessageIdToDelete != -1)
-                    await botClient.DeleteMessageAsync(update.Message.Chat.Id,
-                        reservation.MessageIdToDelete, cancellationToken);
-
-                reservation.AdditionalInfo = update.Message.Text!;
-                await UserControl.AddReservation(user, reservation);
-                await CallConformationWithNewMessage(botClient, update, cancellationToken, reservation, user);
-            }
+            if (reservation.StartTime != TimeSpan.FromHours(-1) && reservation.InProcess)
+                         {
+                             if (reservation.MessageIdToDelete != -1)
+                                 await botClient.DeleteMessageAsync(update.Message.Chat.Id,
+                                     reservation.MessageIdToDelete, cancellationToken);
+             
+                             reservation.AdditionalInfo = update.Message.Text!;
+                             await UserControl.AddReservation(user, reservation);
+                             await CallConformationWithNewMessage(botClient, update, cancellationToken, reservation, user);
+                         }
+            else if (update.Message.Text == "/start")
+                             {
+                                 await CallMainWithNewMessage(botClient, update, cancellationToken, user);
+                             }
             else
             {
                 await botClient.DeleteMessageAsync(update.Message.Chat.Id, update.Message.MessageId,

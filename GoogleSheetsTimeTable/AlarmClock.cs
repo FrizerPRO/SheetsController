@@ -8,7 +8,7 @@ public class AlarmClock
     private readonly DateTime alarmTime;
     private readonly Timer timer;
     private EventHandler alarmEvent;
-    private bool enabled;
+    private readonly bool enabled;
 
     public AlarmClock(DateTime alarmTime)
     {

@@ -53,14 +53,14 @@ public class PlayZone
                 item => item.Value == j - duration + 2).Key;
             var durationInTime = SheetsController.TimeToRowNumber.FirstOrDefault(
                 item => item.Value == duration + 2).Key;
-            var values = SheetsController.GetFreeTables(this, durationInTime,
+            var values = SheetsController.GetFreeTables(this, durationInTime, false,
                 i + 1);
 
             var additionalInfo = "";
             if (allValues.Length > 1)
                 additionalInfo = allValues[1];
             var t = await UserControl.AddReservation(new User(nickname), await values, startTime,
-                durationInTime, additionalInfo, i + 1,false);
+                durationInTime, additionalInfo, i + 1, false);
             Console.WriteLine(nickname);
             j--;
         }

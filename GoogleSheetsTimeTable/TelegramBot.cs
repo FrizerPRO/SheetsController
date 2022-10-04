@@ -20,6 +20,7 @@ public class TelegramBot
 
     public void Run()
     {
+        BotClient.Timeout = TimeSpan.FromMinutes(10);
         var clock = new AlarmClock(_midnight);
         clock.Alarm += async (sender, e) =>
             {
@@ -30,7 +31,7 @@ public class TelegramBot
         var receiverOptions = new ReceiverOptions();
         receiverOptions.AllowedUpdates = new[] { UpdateType.Message, UpdateType.CallbackQuery };
         BotClient.StartReceiving(
-            TelegramBotController.HandleUpdateAsync,
+            TelegramBotController.HandleUpdateAsyncWithTryCatch,
             TelegramBotController.HandlePollingErrorAsync,
             cancellationToken: CancellationTokenSource.Token,
             receiverOptions: receiverOptions

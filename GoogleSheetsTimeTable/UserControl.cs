@@ -58,7 +58,7 @@ public static class UserControl
         if (tables.Count == 0)
             return false;
         var res = await SheetsController.TrySetFreeTime(tables, startTime, user.Nickname, duration, tables[0].Zone,
-            additionalInfo, tableNumber,checkForTimeCapable);
+            additionalInfo, checkForTimeCapable, tableNumber);
         if (res == null)
             return false;
         user.Reservations.Add(res);
