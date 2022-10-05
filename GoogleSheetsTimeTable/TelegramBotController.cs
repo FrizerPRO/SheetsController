@@ -1,4 +1,5 @@
 using System.Reflection;
+using Google.Apis.Sheets.v4.Data;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
@@ -97,18 +98,42 @@ public static class TelegramBotController
 
     public static async Task<InlineKeyboardMarkup> GetFreeTimeTab(List<GameTable> gameTables)
     {
+        bool isTomorrow = false;
+        bool isToday = false;
         List<IList<InlineKeyboardButton>> result = new();
         var allFreeTime = await SheetsController.GetAllFreeTimeSpans(gameTables);
         for (var i = 0; i < allFreeTime.Count;)
         {
-            List<InlineKeyboardButton> tableNumbers = new();
+            List<InlineKeyboardButton> freeTimeSpans = new();
             for (var j = 0; j < 3 && i < allFreeTime.Count; j++, i++)
-                tableNumbers.Add(InlineKeyboardButton.WithCallbackData(allFreeTime[i].ToString(),
+            {
+                if (allFreeTime[i] >= TimeSpan.FromDays(1) && !isTomorrow)
+                {
+                    isTomorrow = true;
+                    result.Add(freeTimeSpans);
+                    result.Add(new[]
+                    {
+                        InlineKeyboardButton.WithCallbackData("⬇Завтра⬇", "Tomorrow")
+                    });
+                    j = 0;
+                    freeTimeSpans = new();
+                    continue;
+                } else if(allFreeTime[i] < TimeSpan.FromDays(1) && !isToday)
+                {
+                    isToday = true;
+                    result.Add(new[]
+                    {
+                        InlineKeyboardButton.WithCallbackData("⬇Сегодня⬇", "Today")
+                    });
+                }
+
+                string time = (isTomorrow?(allFreeTime[i]-TimeSpan.FromDays(1)).ToString(): allFreeTime[i].ToString());
+                freeTimeSpans.Add(InlineKeyboardButton.WithCallbackData(time,
                     $"FreeTime {allFreeTime[i].ToString()}"));
-
-            result.Add(tableNumbers);
+            }
+            result.Add(freeTimeSpans);
         }
-
+        
         result.Add(new[]
         {
             InlineKeyboardButton.WithCallbackData("Назад", "Duration")
@@ -121,7 +146,7 @@ public static class TelegramBotController
         List<IList<InlineKeyboardButton>> result = new();
         result.Add(new[]
         {
-            InlineKeyboardButton.WithCallbackData("Ввести дополнительную\nинформацию",
+            InlineKeyboardButton.WithCallbackData("Ввести дополнительную информацию",
                 "SetAdditionalInfo")
         });
         result.Add(new[]
@@ -315,6 +340,7 @@ public static class TelegramBotController
         }
         catch (ApiRequestException exception)
         {
+            Console.WriteLine(exception.Message);
             if (exception.ErrorCode != 400) Console.WriteLine(exception.Message);
         }
     }
@@ -482,6 +508,8 @@ public static class TelegramBotController
                     await CallMain(botClient, update, cancellationToken, user);
                     break;
                 }
+                default:
+                    return;
             }
         }
 
