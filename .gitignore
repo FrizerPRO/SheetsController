@@ -1,2 +1,5 @@
 service_account.json
 ConsoleApp1/Credential/credentials.json
+ConsoleApp1/bin/Debug/net6.0/Credential/credentials.json
+ConsoleApp1/bin/Debug/net6.0/Credential/service_account.json
+ConsoleApp1/bin/Debug/net6.0/Credential/telegram_token.txt
