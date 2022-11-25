@@ -1,6 +1,6 @@
 ﻿using SheetsController;
 
 using var cts = new CancellationTokenSource();
-TelegramBot bot = new("641114157:AAHVLzkTq8QnfXuubRm3zXVM_CMzZQ8QODY", cts);
+TelegramBot bot = new(TELEGRAM_BOT_KEY, cts);
 bot.Run();
 Console.ReadLine();
